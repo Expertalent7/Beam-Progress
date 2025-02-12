@@ -18,6 +18,11 @@
             position: relative;
             display: inline-block;
         }
+	.beam.highlight {
+    	    border: 3px solid yellow !important;
+    	    box-shadow: 0px 0px 10px yellow;
+	}
+
         .beam {
             position: absolute;
             background-color: rgba(255, 0, 0, 0.5); /* Red transparent overlay */
@@ -125,18 +130,19 @@
 
     <script>
         function searchBeam() {
-            let input = document.getElementById("beamSearch").value.toLowerCase();
-            let beams = document.querySelectorAll(".beam");
+    let input = document.getElementById("beamSearch").value.toLowerCase().trim();
+    let beams = document.querySelectorAll(".beam");
 
-            beams.forEach(beam => {
-                let beamName = beam.getAttribute("data-name").toLowerCase();
-                if (beamName.includes(input) && input !== "") {
-                    beam.classList.add("highlight");
-                } else {
-                    beam.classList.remove("highlight");
-                }
-            });
+    beams.forEach(beam => {
+        let beamName = beam.getAttribute("data-name").toLowerCase().trim();
+        if (beamName.includes(input) && input !== "") {
+            beam.classList.add("highlight");
+        } else {
+            beam.classList.remove("highlight");
         }
+    });
+}
+
 
         function closePanel() {
             document.getElementById("beamDetailsPanel").style.display = "none";
