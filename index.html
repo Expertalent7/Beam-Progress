@@ -372,7 +372,7 @@
         document.getElementById("beamName").innerText = beamName;
         document.getElementById("beamStatus").innerText = beamStatus;
         document.getElementById("beamWeight").innerText = `${beamWeight} kg`;
-        document.getElementById("beamProgress").innerText = `${beamProgress}%`; // ✅ Display progress
+        document.getElementById("beamProgress").innerText = beamProgress; // ✅ Display progress
         document.getElementById("beamQRCode").src = beamQRCode; 
 
         let isMobile = window.innerWidth <= 768;
