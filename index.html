@@ -91,11 +91,60 @@
         touch-action: manipulation;
     	}
 	}
+	    
+	:root {
+    	--bg-color: white;
+    	--text-color: black;
+    	--panel-bg: white;
+    	--beam-color: rgba(255, 0, 0, 0.5);
+	}
+
+	.dark-mode {
+    	--bg-color: #121212;
+    	--text-color: white;
+    	--panel-bg: #1e1e1e;
+    	--beam-color: rgba(0, 255, 255, 0.5);
+	}
+
+	body {
+    	background-color: var(--bg-color);
+    	color: var(--text-color);
+    	transition: background 0.3s ease, color 0.3s ease;
+	}
+
+	.details-panel {
+    	background-color: var(--panel-bg);
+    	color: var(--text-color);
+    	border: 1px solid #666;
+	}
+
+	.beam {
+    	background-color: var(--beam-color);
+	}
+
+	.toggle-btn {
+    	position: absolute;
+    	top: 10px;
+    	right: 10px;
+    	background: #444;
+    	color: white;
+    	padding: 8px 12px;
+    	border: none;
+    	cursor: pointer;
+    	border-radius: 5px;
+    	font-size: 14px;
+    	transition: background 0.3s ease;
+	}
+
+	.toggle-btn:hover {
+    	background: #666;
+	}
 
 
     </style>
 </head>
 <body>
+    <button id="darkModeToggle" class="toggle-btn">🌙 Dark Mode</button>
 
     <h1>Beam Selection Tool</h1>
 
@@ -231,6 +280,29 @@ function clearSearch() {
     	});
 	});
 
+	document.addEventListener("DOMContentLoaded", function () {
+    	const darkModeToggle = document.getElementById("darkModeToggle");
+    	const body = document.body;
+
+   	 // Load saved dark mode preference
+   	 if (localStorage.getItem("darkMode") === "enabled") {
+        body.classList.add("dark-mode");
+        darkModeToggle.innerText = "☀ Light Mode";
+    	}
+
+    	// Toggle dark mode on button click
+    	darkModeToggle.addEventListener("click", function () {
+        body.classList.toggle("dark-mode");
+
+        if (body.classList.contains("dark-mode")) {
+            localStorage.setItem("darkMode", "enabled");
+            darkModeToggle.innerText = "☀ Light Mode";
+        	} else {
+            localStorage.setItem("darkMode", "disabled");
+            darkModeToggle.innerText = "🌙 Dark Mode";
+        	}
+    	});
+	});
 
 
         async function fetchBeamStatus() {
