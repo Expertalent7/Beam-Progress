@@ -53,16 +53,18 @@
             color: darkblue;
         }
         .details-panel {
-            position: absolute;
-            top: 50px;
-            right: 20px;
-            width: 250px;
-            background: white;
-            border: 1px solid #ccc;
-            padding: 15px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            display: none;
-        }
+    	position: absolute;
+    	background: white;
+    	border: 1px solid #ccc;
+    	padding: 10px;
+    	border-radius: 5px;
+    	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+    	display: none;
+    	z-index: 1000;
+    	font-size: 14px;
+    	transition: opacity 0.2s ease-in-out;
+	}
+
     </style>
 </head>
 <body>
@@ -111,15 +113,15 @@
 
     </div>
 
-    <!-- Beam Details Panel -->
-    <div id="beamDetailsPanel" class="details-panel">
-        <h3>Beam Details</h3>
-        <p><strong>Name:</strong> <span id="beamName"></span></p>
-        <p><strong>Status:</strong> <span id="beamStatus"></span></p>
-        <p><strong>Weight:</strong> <span id="beamWeight"></span></p>
-        <p><strong>Last Scanned:</strong> <span id="beamLastScanned"></span></p>
-        <button onclick="closePanel()">Close</button>
+    <!-- Beam Details Panel (Dynamic Positioning) -->
+    <div id="beamDetailsPanel" class="details-panel" style="display: none;">
+    <h3>Beam Details</h3>
+    <p><strong>Name:</strong> <span id="beamName"></span></p>
+    <p><strong>Status:</strong> <span id="beamStatus"></span></p>
+    <p><strong>Weight:</strong> <span id="beamWeight"></span></p>
+    <p><strong>Last Scanned:</strong> <span id="beamLastScanned"></span></p>
     </div>
+
 
     <div id="beam-info">Click on a beam to see details</div>
 
@@ -159,23 +161,38 @@ function clearSearch() {
         }
 
         document.addEventListener("DOMContentLoaded", function () {
-            document.querySelectorAll('.beam').forEach(beam => {
-                beam.addEventListener('click', function () {
-                    let beamName = this.getAttribute('data-name');
-                    let beamStatus = this.classList.contains("selected") ? "Installed" : "Not Installed";
-                    
-                    let beamWeight = "500 kg";  // Example
-                    let beamLastScanned = new Date().toLocaleString(); // Example
+    	document.querySelectorAll('.beam').forEach(beam => {
+        beam.addEventListener('click', function (event) {
+            let beamName = this.getAttribute('data-name');
+            let beamStatus = this.classList.contains("selected") ? "Installed" : "Not Installed";
 
-                    document.getElementById("beamName").innerText = beamName;
-                    document.getElementById("beamStatus").innerText = beamStatus;
-                    document.getElementById("beamWeight").innerText = beamWeight;
-                    document.getElementById("beamLastScanned").innerText = beamLastScanned;
-                    
-                    document.getElementById("beamDetailsPanel").style.display = "block";
-                });
+            // Example data (replace with real backend values)
+            let beamWeight = "500 kg";  
+            let beamLastScanned = new Date().toLocaleString(); 
+
+            // Update the beam details panel
+            let panel = document.getElementById("beamDetailsPanel");
+            document.getElementById("beamName").innerText = beamName;
+            document.getElementById("beamStatus").innerText = beamStatus;
+            document.getElementById("beamWeight").innerText = beamWeight;
+            document.getElementById("beamLastScanned").innerText = beamLastScanned;
+
+            // Position the panel near the click event
+            panel.style.display = "block";
+            panel.style.left = `${event.pageX + 10}px`;
+            panel.style.top = `${event.pageY + 10}px`;
             });
-        });
+    	    });
+
+    // Close the panel when clicking outside
+    document.addEventListener("click", function (event) {
+        let panel = document.getElementById("beamDetailsPanel");
+        if (!panel.contains(event.target) && !event.target.classList.contains("beam")) {
+            panel.style.display = "none";
+        }
+    });
+});
+
 
         async function fetchBeamStatus() {
             let statusMessage = document.getElementById("statusMessage");
