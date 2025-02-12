@@ -315,9 +315,10 @@
     <p><strong>Last Scanned:</strong> <span id="beamLastScanned"></span></p>
     <p><strong>QR Code:</strong></p>
     <a id="beamQRCodeLink" href="#" target="_blank">
-    <img id="beamQRCode" src="https://via.placeholder.com/150x150?text=No+QR+Code" alt="QR Code" style="width: 150px; height: 150px;">
+    <img id="beamQRCode" src="https://dummyimage.com/150x150/cccccc/000000&text=No+QR+Code" alt="QR Code" style="width: 150px; height: 150px;">
     </a>
     <button onclick="closePanel()">❌ Close</button>
+
 
 </div>
 
@@ -364,15 +365,15 @@
         let beamName = this.getAttribute("data-name");
         let beamStatus = this.classList.contains("selected") ? "Installed" : "Not Installed";
         let beamWeight = this.getAttribute("data-weight") || "Unknown"; 
-        let beamQRCode = this.dataset.qrCode || ""; // Get QR Code URL
+        let beamQRCode = this.dataset.qrCode || ""; // ✅ Correctly fetch QR Code from dataset
 
-        // Update panel content
+        // Update details panel
         document.getElementById("beamName").innerText = beamName;
         document.getElementById("beamStatus").innerText = beamStatus;
         document.getElementById("beamWeight").innerText = `${beamWeight} kg`;
         document.getElementById("beamLastScanned").innerText = new Date().toLocaleString();
 
-        // Update QR Code display
+        // ✅ Correctly set QR Code image and link
         let qrImage = document.getElementById("beamQRCode");
         let qrLink = document.getElementById("beamQRCodeLink");
 
@@ -380,11 +381,11 @@
             qrImage.src = beamQRCode;
             qrLink.href = beamQRCode;
         } else {
-            qrImage.src = "https://via.placeholder.com/150x150?text=No+QR+Code";
-            qrLink.href = "#"; // No link if no QR code
+            qrImage.src = "https://dummyimage.com/150x150/cccccc/000000&text=No+QR+Code"; // Use default if missing
+            qrLink.href = "#"; // Disable link if no QR
         }
 
-        // Show panel at correct position
+        // Position panel
         let isMobile = window.innerWidth <= 768;
         beamDetailsPanel.style.left = isMobile ? "50%" : `${event.pageX + 10}px`;
         beamDetailsPanel.style.top = isMobile ? "50%" : `${event.pageY + 10}px`;
@@ -415,41 +416,50 @@
     });
 
     // 🔄 Fetch Beam Status
-    async function fetchBeamStatus() {
-        if (!statusMessage || !progressText || !progressBar) {
-            console.error("❌ Error: Required elements (statusMessage, progress, progressBar) not found!");
-            return;
-        }
 
-        statusMessage.innerText = "Updating beam status...";
-
-        try {
-            const response = await fetch("https://script.google.com/macros/s/AKfycbymfNB5JLWgCXVNSAMvJI2wBUT9XBGGDUun96rjMQxeqUxQOZoixkMrayBir9pJ0DLLSw/exec");
-            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-            const data = await response.json();
-
-            data.beams.forEach(beam => {
-                let beamElement = document.querySelector(`.beam[data-name="${beam.Beam_Name.trim().toLowerCase()}"]`);
-                if (beamElement) {
-                    beamElement.classList.toggle("selected", beam.Scanned === true || beam.Scanned === "TRUE");
-                    beamElement.dataset.qrCode = beam.QR_Code; // ✅ Store QR Code
-                    beamElement.setAttribute("data-weight", beam.Weight); // ✅ Store Weight
-                }
-            });
-
-            if (data.progress !== undefined) {
-                let progressValue = parseFloat(data.progress).toFixed(2);
-                progressText.innerText = `Installation Progress: ${progressValue}%`;
-                progressBar.style.width = `${progressValue}%`;
-                progressBar.innerText = `${progressValue}%`;
-            }
-
-        } catch (error) {
-            console.error("❌ Error fetching beam data:", error);
-        } finally {
-            statusMessage.innerText = "Beam status updated!";
-        }
+	async function fetchBeamStatus() {
+    if (!statusMessage || !progressText || !progressBar) {
+        console.error("❌ Error: Required elements (statusMessage, progress, progressBar) not found!");
+        return;
     }
+
+    statusMessage.innerText = "Updating beam status...";
+
+    try {
+        const response = await fetch("https://script.google.com/macros/s/AKfycbymfNB5JLWgCXVNSAMvJI2wBUT9XBGGDUun96rjMQxeqUxQOZoixkMrayBir9pJ0DLLSw/exec");
+        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+        const data = await response.json();
+
+        data.beams.forEach(beam => {
+            let beamElement = document.querySelector(`.beam[data-name="${beam.Beam_Name.trim().toLowerCase()}"]`);
+            
+            if (beamElement) {
+                // Set Installed Status
+                beamElement.classList.toggle("selected", beam.Scanned === true || beam.Scanned === "TRUE");
+
+                // ✅ Set Weight dynamically
+                beamElement.setAttribute("data-weight", beam.Weight);
+
+                // ✅ Set QR Code dynamically from API
+                beamElement.dataset.qrCode = beam.QR_Code || ""; 
+            }
+        });
+
+        if (data.progress !== undefined) {
+            let progressValue = parseFloat(data.progress).toFixed(2);
+            progressText.innerText = `Installation Progress: ${progressValue}%`;
+            progressBar.style.width = `${progressValue}%`;
+            progressBar.innerText = `${progressValue}%`;
+        }
+
+    } catch (error) {
+        console.error("❌ Error fetching beam data:", error);
+    } finally {
+        statusMessage.innerText = "Beam status updated!";
+    }
+}
+
+	     
 	// 🎯 Tooltip for Beam Info on Hover
 	const tooltip = document.createElement("div");
 	tooltip.classList.add("beam-tooltip");
