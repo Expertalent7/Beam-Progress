@@ -42,6 +42,7 @@
     <h1>Beam Selection Tool</h1>
     <div class="container">
         <img src="https://expertalent7.github.io/beam-selection/structure.jpg" alt="Structure" width="494" height="682">
+	<input type="text" id="beamSearch" placeholder="Search beam..." onkeyup="searchBeam()" style="width: 100%; padding: 8px; margin-bottom: 10px;">
 
         <!-- Beams -->
         <div class="beam" style="top: 125px; left: 158px; width: 143px; height: 7px;" data-name="beam a"></div>
@@ -214,8 +215,13 @@ style.innerHTML = `
         font-size: 12px;
         display: none;
     }
+    .beam.highlight {
+        stroke: yellow !important;
+        stroke-width: 4px !important;
+    }
 `;
 document.head.appendChild(style);
+
 
 // Tooltip functionality
 const tooltip = document.createElement('div');
@@ -237,6 +243,19 @@ if (beams.length > 0) {
     });
 } else {
     console.warn("⚠️ No beams found in the document!");
+}
+function searchBeam() {
+    let input = document.getElementById("beamSearch").value.toLowerCase();
+    let beams = document.querySelectorAll(".beam");
+
+    beams.forEach(beam => {
+        let beamName = beam.getAttribute("data-name").toLowerCase();
+        if (beamName.includes(input) && input !== "") {
+            beam.classList.add("highlight");
+        } else {
+            beam.classList.remove("highlight");
+        }
+    });
 }
 
 
