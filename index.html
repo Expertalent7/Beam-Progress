@@ -208,6 +208,18 @@
 	    }
 	}
 
+	.beam-tooltip {
+    	position: absolute;
+    	background: #222;
+    	color: white;
+    	padding: 5px 10px;
+    	border-radius: 5px;
+    	font-size: 12px;
+    	display: none;
+    	box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+    	pointer-events: none; /* Prevent tooltip from interfering with mouse events */
+	}
+
     </style>
 </head>
 <body>
@@ -408,6 +420,38 @@
             statusMessage.innerText = "Beam status updated!";
         }
     }
+	// 🎯 Tooltip for Beam Info on Hover
+	const tooltip = document.createElement("div");
+	tooltip.classList.add("beam-tooltip");
+	document.body.appendChild(tooltip);
+
+	beams.forEach(beam => {
+    	beam.addEventListener("mouseenter", (e) => {
+        let beamName = e.target.getAttribute("data-name");
+        let beamStatus = e.target.classList.contains("selected") ? "Installed" : "Not Installed";
+
+        // ✅ Display the tooltip with beam info
+        tooltip.innerText = `${beamName} - ${beamStatus}`;
+        tooltip.style.left = `${e.pageX + 10}px`;
+        tooltip.style.top = `${e.pageY + 10}px`;
+        tooltip.style.display = "block";
+    	});
+
+    	beam.addEventListener("mousemove", (e) => {
+        // ✅ Move tooltip with cursor
+        tooltip.style.left = `${e.pageX + 10}px`;
+        tooltip.style.top = `${e.pageY + 10}px`;
+    	});
+
+    	beam.addEventListener("mouseleave", () => {
+        // ❌ Hide tooltip when mouse leaves beam
+        tooltip.style.display = "none";
+    });
+});
+
+// 🔄 Fetch Beam Status Every 5 Seconds
+setInterval(fetchBeamStatus, 5000);
+fetchBeamStatus();
 
     // 🔄 Refresh Beam Status Every 5 Seconds
     setInterval(fetchBeamStatus, 5000);
