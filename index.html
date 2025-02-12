@@ -315,9 +315,10 @@
     <p><strong>Last Scanned:</strong> <span id="beamLastScanned"></span></p>
     <p><strong>QR Code:</strong></p>
     <a id="beamQRCodeLink" href="#" target="_blank">
-        <img id="beamQRCode" src="https://via.placeholder.com/150x150" alt="QR Code" style="width: 150px; height: 150px;">
+    <img id="beamQRCode" src="https://via.placeholder.com/150x150?text=No+QR+Code" alt="QR Code" style="width: 150px; height: 150px;">
     </a>
     <button onclick="closePanel()">❌ Close</button>
+
 </div>
 
 
@@ -358,22 +359,32 @@
     window.closePanel = closePanel;
 
     // 🎯 Show Beam Details on Click
-    beams.forEach(beam => {
+   beams.forEach(beam => {
     beam.addEventListener("click", function (event) {
         let beamName = this.getAttribute("data-name");
         let beamStatus = this.classList.contains("selected") ? "Installed" : "Not Installed";
         let beamWeight = this.getAttribute("data-weight") || "Unknown"; 
-        let qrCodeUrl = this.dataset.qrCode || "https://via.placeholder.com/150x150"; 
+        let beamQRCode = this.dataset.qrCode || ""; // Get QR Code URL
 
+        // Update panel content
         document.getElementById("beamName").innerText = beamName;
         document.getElementById("beamStatus").innerText = beamStatus;
         document.getElementById("beamWeight").innerText = `${beamWeight} kg`;
         document.getElementById("beamLastScanned").innerText = new Date().toLocaleString();
 
-        // ✅ Update QR Code Image & Link
-        document.getElementById("beamQRCode").src = qrCodeUrl;
-        document.getElementById("beamQRCodeLink").href = qrCodeUrl;
+        // Update QR Code display
+        let qrImage = document.getElementById("beamQRCode");
+        let qrLink = document.getElementById("beamQRCodeLink");
 
+        if (beamQRCode) {
+            qrImage.src = beamQRCode;
+            qrLink.href = beamQRCode;
+        } else {
+            qrImage.src = "https://via.placeholder.com/150x150?text=No+QR+Code";
+            qrLink.href = "#"; // No link if no QR code
+        }
+
+        // Show panel at correct position
         let isMobile = window.innerWidth <= 768;
         beamDetailsPanel.style.left = isMobile ? "50%" : `${event.pageX + 10}px`;
         beamDetailsPanel.style.top = isMobile ? "50%" : `${event.pageY + 10}px`;
@@ -381,6 +392,7 @@
         beamDetailsPanel.style.display = "block";
     });
 });
+
 
 
     // ❌ Close Panel When Clicking Outside
