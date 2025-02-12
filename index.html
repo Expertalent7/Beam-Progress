@@ -220,6 +220,19 @@
     	pointer-events: none; /* Prevent tooltip from interfering with mouse events */
 	}
 
+	#beamQRCode {
+    	display: block;
+    	margin: 10px auto;
+    	border: 2px solid #ccc;
+    	border-radius: 5px;
+    	cursor: pointer;
+	}
+
+	#beamQRCode:hover {
+    	border-color: #007bff;
+	}
+
+
     </style>
 </head>
 <body>
@@ -295,17 +308,18 @@
 
     <!-- 📌 Beam Details Panel -->
     <div id="beamDetailsPanel" class="details-panel" style="display: none;">
-        <h3>Beam Details</h3>
-        <p><strong>Name:</strong> <span id="beamName"></span></p>
-        <p><strong>Status:</strong> <span id="beamStatus"></span></p>
-        <p><strong>Weight:</strong> <span id="beamWeight"></span></p>
-        <p><strong>Last Scanned:</strong> <span id="beamLastScanned"></span></p>
-	<p><strong>QR Code:</strong> <br>
-    	<img id="beamQRCode" src="" alt="QR Code" style="width: 150px; height: 150px; margin-top: 10px;">
-	</p>
+    <h3>Beam Details</h3>
+    <p><strong>Name:</strong> <span id="beamName"></span></p>
+    <p><strong>Status:</strong> <span id="beamStatus"></span></p>
+    <p><strong>Weight:</strong> <span id="beamWeight"></span></p>
+    <p><strong>Last Scanned:</strong> <span id="beamLastScanned"></span></p>
+    <p><strong>QR Code:</strong></p>
+    <a id="beamQRCodeLink" href="#" target="_blank">
+        <img id="beamQRCode" src="https://via.placeholder.com/150" alt="QR Code" style="width: 150px; height: 150px;">
+    </a>
+    <button onclick="closePanel()">❌ Close</button>
+</div>
 
-        <button onclick="closePanel()" style="margin-top: 10px; padding: 5px; cursor: pointer;">❌ Close</button>
-    </div>
 
     <div id="beam-info">Click on a beam to see details</div>
 
@@ -345,25 +359,29 @@
 
     // 🎯 Show Beam Details on Click
     beams.forEach(beam => {
-        beam.addEventListener("click", function (event) {
-            let beamName = this.getAttribute("data-name");
-            let beamStatus = this.classList.contains("selected") ? "Installed" : "Not Installed";
-            let beamWeight = this.getAttribute("data-weight") || "Unknown"; // Get weight
-            let beamQRCode = this.dataset.qrCode || "https://via.placeholder.com/150"; // Get QR Code
+    beam.addEventListener("click", function (event) {
+        let beamName = this.getAttribute("data-name");
+        let beamStatus = this.classList.contains("selected") ? "Installed" : "Not Installed";
+        let beamWeight = this.getAttribute("data-weight") || "Unknown"; 
+        let qrCodeUrl = this.dataset.qrCode || "https://via.placeholder.com/150"; 
 
-            document.getElementById("beamName").innerText = beamName;
-            document.getElementById("beamStatus").innerText = beamStatus;
-            document.getElementById("beamWeight").innerText = `${beamWeight} kg`;
-            document.getElementById("beamQRCode").src = beamQRCode; // ✅ Assign QR Code to Image
-            document.getElementById("beamLastScanned").innerText = new Date().toLocaleString();
+        document.getElementById("beamName").innerText = beamName;
+        document.getElementById("beamStatus").innerText = beamStatus;
+        document.getElementById("beamWeight").innerText = `${beamWeight} kg`;
+        document.getElementById("beamLastScanned").innerText = new Date().toLocaleString();
 
-            let isMobile = window.innerWidth <= 768;
-            beamDetailsPanel.style.left = isMobile ? "50%" : `${event.pageX + 10}px`;
-            beamDetailsPanel.style.top = isMobile ? "50%" : `${event.pageY + 10}px`;
-            beamDetailsPanel.style.transform = isMobile ? "translate(-50%, -50%)" : "";
-            beamDetailsPanel.style.display = "block";
-        });
+        // ✅ Update QR Code Image & Link
+        document.getElementById("beamQRCode").src = qrCodeUrl;
+        document.getElementById("beamQRCodeLink").href = qrCodeUrl;
+
+        let isMobile = window.innerWidth <= 768;
+        beamDetailsPanel.style.left = isMobile ? "50%" : `${event.pageX + 10}px`;
+        beamDetailsPanel.style.top = isMobile ? "50%" : `${event.pageY + 10}px`;
+        beamDetailsPanel.style.transform = isMobile ? "translate(-50%, -50%)" : "";
+        beamDetailsPanel.style.display = "block";
     });
+});
+
 
     // ❌ Close Panel When Clicking Outside
     document.addEventListener("click", function (event) {
