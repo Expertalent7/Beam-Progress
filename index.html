@@ -288,6 +288,10 @@
         <p><strong>Status:</strong> <span id="beamStatus"></span></p>
         <p><strong>Weight:</strong> <span id="beamWeight"></span></p>
         <p><strong>Last Scanned:</strong> <span id="beamLastScanned"></span></p>
+	<p><strong>QR Code:</strong> <br>
+    	<img id="beamQRCode" src="" alt="QR Code" style="width: 150px; height: 150px; margin-top: 10px;">
+	</p>
+
         <button onclick="closePanel()" style="margin-top: 10px; padding: 5px; cursor: pointer;">❌ Close</button>
     </div>
 
@@ -336,6 +340,7 @@
         document.getElementById("beamName").innerText = beamName;
         document.getElementById("beamStatus").innerText = beamStatus;
         document.getElementById("beamWeight").innerText = `${beamWeight} kg`; // Display correct weight
+	document.getElementById("beamQRCode").src = this.dataset.qrCode || "https://via.placeholder.com/150"; 
         document.getElementById("beamLastScanned").innerText = new Date().toLocaleString();
 
         let isMobile = window.innerWidth <= 768;
@@ -382,8 +387,12 @@
 
         data.beams.forEach(beam => {
             let beamElement = document.querySelector(`.beam[data-name="${beam.Beam_Name.trim().toLowerCase()}"]`);
-            if (beamElement) {
-                beamElement.classList.toggle("selected", beam.Scanned === true || beam.Scanned === "TRUE");
+		if (beamElement) {
+    		beamElement.classList.toggle("selected", beam.Scanned === true || beam.Scanned === "TRUE");
+
+    		// Store QR Code in dataset
+    		beamElement.dataset.qrCode = beam.QR_Code; 
+		}
 
                 // Store weight dynamically in beam attributes
                 beamElement.setAttribute("data-weight", beam.Weight);
