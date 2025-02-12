@@ -135,6 +135,7 @@ async function fetchBeamStatus() {
             progressText.innerText = `Installation Progress: ${progressValue}%`;
             progressBar.style.width = `${progressValue}%`;
             progressBar.innerText = `${progressValue}%`;
+            checkMilestone(progressValue);
         } else {
             console.warn("⚠️ Progress data not found in response!");
         }
@@ -187,6 +188,35 @@ document.querySelectorAll('.beam').forEach(beam => {
         tooltip.style.display = 'none';
     });
 });
+
+// User Role Management
+const userRole = "admin"; // Possible values: admin, supervisor, viewer
+if (userRole !== "admin") {
+    document.querySelectorAll(".beam").forEach(beam => {
+        beam.style.pointerEvents = "none"; // Disable interactions for non-admins
+    });
+}
+
+// Export Data Functionality
+function exportData(format) {
+    let data = JSON.stringify({ progress: document.getElementById("progress").innerText });
+    let blob = new Blob([data], { type: "application/json" });
+    let link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `beam_tracking.${format}`;
+    link.click();
+}
+
+document.getElementById("exportCSV").addEventListener("click", () => exportData("csv"));
+document.getElementById("exportPDF").addEventListener("click", () => exportData("pdf"));
+
+// Notification System
+function checkMilestone(progress) {
+    const milestones = [25, 50, 75, 100];
+    if (milestones.includes(parseInt(progress))) {
+        alert(`🎉 Milestone reached: ${progress}% completed!`);
+    }
+}
 
 
 
