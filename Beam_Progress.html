@@ -86,32 +86,17 @@
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-    ensureElementsExist();
-});
-
-function ensureElementsExist() {
-    let statusMessage = document.getElementById("statusMessage");
-    let progressText = document.getElementById("progress");
-    let progressBar = document.getElementById("progressBar");
-
-    if (!statusMessage || !progressText || !progressBar) {
-        console.warn("⚠️ Waiting for required elements...");
-        setTimeout(ensureElementsExist, 500); // 🔄 Retry every 500ms
-        return;
-    }
-
-    console.log("✅ All required elements found. Starting updates...");
     fetchBeamStatus(); // Initial fetch
     setInterval(fetchBeamStatus, 5000); // Refresh progress every 5 seconds
-}
+});
 
 async function fetchBeamStatus() {
     let statusMessage = document.getElementById("statusMessage");
-    let progressText = document.getElementById("progress");
+    let progressText = document.getElementById("progress"); 
     let progressBar = document.getElementById("progressBar");
 
     if (!statusMessage || !progressText || !progressBar) {
-        console.error("❌ ERROR: One or more required elements (statusMessage, progress, progressBar) NOT FOUND!");
+        console.error("❌ Error: One or more required elements (statusMessage, progress, progressBar) not found!");
         return;
     }
 
@@ -119,22 +104,18 @@ async function fetchBeamStatus() {
 
     try {
         const response = await fetch("https://script.google.com/macros/s/AKfycbzbWJwW1O5-zVWl74YohX7nDqCWZk9zncL4StAsUfAE82aU1Jh-woCUBFhOJ5i39Ysz1g/exec");
-
         if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-
         const data = await response.json();
-        console.log("✅ Beam Data Fetched:", data);
+        console.log("✅ Fetched Beam Data:", data);
 
         let missingBeams = [];
 
-        // ✅ Update Beam Colors
         data.beams.forEach(beam => {
             let beamName = beam.Beam_Name.trim().toLowerCase();
             let beamElement = document.querySelector(`.beam[data-name="${beamName}"]`);
 
             if (beamElement) {
                 console.log(`✅ Updating Beam: ${beam.Beam_Name}, Scanned: ${beam.Scanned}`);
-                
                 if (beam.Scanned === true || beam.Scanned === "TRUE") {
                     beamElement.classList.add("selected");
                 } else {
@@ -146,26 +127,67 @@ async function fetchBeamStatus() {
         });
 
         if (missingBeams.length > 0) {
-            console.warn(`⚠️ Beams NOT found in HTML:`, missingBeams.join(", "));
+            console.warn(`⚠️ Beams not found in HTML:`, missingBeams.join(", "));
         }
 
-        // ✅ Update Progress Percentage
         if (data.progress !== undefined) {
             let progressValue = parseFloat(data.progress).toFixed(2);
             progressText.innerText = `Installation Progress: ${progressValue}%`;
             progressBar.style.width = `${progressValue}%`;
             progressBar.innerText = `${progressValue}%`;
         } else {
-            console.warn("⚠️ Progress data NOT found in response!");
+            console.warn("⚠️ Progress data not found in response!");
         }
 
     } catch (error) {
-        console.error("❌ ERROR fetching beam data:", error);
+        console.error("❌ Error fetching beam data:", error);
         statusMessage.innerText = "Error loading beam status.";
     } finally {
         statusMessage.innerText = "Beam status updated!";
     }
 }
+
+// Smooth Color Transition
+const style = document.createElement('style');
+style.innerHTML = `
+    .beam {
+        transition: fill 0.5s ease-in-out;
+    }
+    .beam.selected {
+        fill: green !important;
+    }
+    .progress-bar {
+        transition: width 0.5s ease-in-out;
+    }
+    .tooltip {
+        position: absolute;
+        background: #333;
+        color: white;
+        padding: 5px;
+        border-radius: 5px;
+        font-size: 12px;
+        display: none;
+    }
+`;
+document.head.appendChild(style);
+
+// Tooltip functionality
+const tooltip = document.createElement('div');
+tooltip.classList.add('tooltip');
+document.body.appendChild(tooltip);
+
+document.querySelectorAll('.beam').forEach(beam => {
+    beam.addEventListener('mouseenter', (e) => {
+        tooltip.innerText = e.target.getAttribute('data-name');
+        tooltip.style.left = `${e.pageX + 10}px`;
+        tooltip.style.top = `${e.pageY + 10}px`;
+        tooltip.style.display = 'block';
+    });
+    beam.addEventListener('mouseleave', () => {
+        tooltip.style.display = 'none';
+    });
+});
+
 
 
 // 🔄 Refresh every 5 seconds
