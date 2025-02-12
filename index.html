@@ -363,7 +363,7 @@
         let beamName = this.getAttribute("data-name");
         let beamStatus = this.classList.contains("selected") ? "Installed" : "Not Installed";
         let beamWeight = this.getAttribute("data-weight") || "Unknown"; 
-        let qrCodeUrl = this.dataset.qrCode || "https://via.placeholder.com/150"; 
+        let qrCodeUrl = this.dataset.qrCode || "https://via.placeholder.com/150x150"; 
 
         document.getElementById("beamName").innerText = beamName;
         document.getElementById("beamStatus").innerText = beamStatus;
