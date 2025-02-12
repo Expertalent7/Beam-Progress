@@ -5,180 +5,208 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Beam Selection Tool</title>
     <style>
-        body {
-            text-align: center;
-            font-family: Arial, sans-serif;
-        }
-        .wrapper {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .container {
-            position: relative;
-            display: inline-block;
-        }
-	.beam {
-    	transition: all 0.3s ease-in-out;
-	}
-
-	.beam.selected {
-    	transform: scale(1.05);
-    	box-shadow: 0 0 10px rgba(0, 255, 0, 0.8);
-	}
-
-	.beam.highlight {
-    	transition: all 0.3s ease-in-out;
-    	border: 3px solid yellow !important;
-	}
-
-        
-        .beam:hover {
-            background-color: rgba(0, 0, 255, 0.5); /* Blue on hover */
-        }
-        .selected {
-            background-color: rgba(0, 255, 0, 0.7) !important; /* Green when scanned */
-        }
-        #beamSearch {
-            width: 300px;
-            padding: 8px;
-            margin-bottom: 10px;
-            font-size: 14px;
-        }
-        #beam-info {
-            margin-top: 10px;
-            font-size: 18px;
-            font-weight: bold;
-        }
-        #statusMessage {
-            margin-top: 10px;
-            font-size: 16px;
-            font-weight: bold;
-            color: darkblue;
-        }
-        .details-panel {
-    	position: absolute;
-    	background: white;
-    	border: 1px solid #ccc;
-    	padding: 10px;
-    	border-radius: 5px;
-    	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
-    	display: none;
-    	z-index: 1000;
-    	font-size: 14px;
-    	transition: opacity 0.2s ease-in-out;
-    	max-width: 250px;
-	}
-
-	/* 📱 Mobile Responsive Styles */
-	@media (max-width: 768px) {
-    	.container {
-        width: 100%;
-    	}
-
-    	img {
-        max-width: 100%;
-        height: auto;
-    	}
-
-    	.details-panel {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 90%;
-        max-width: 300px;
-    	}
-
-    	.beam {
-        cursor: pointer;
-        touch-action: manipulation;
-    	}
-	}
-	    
-	:root {
-    	--bg-color: white;
-    	--text-color: black;
-    	--panel-bg: white;
-    	--beam-color: rgba(255, 0, 0, 0.5);
-	}
-
-	.dark-mode {
-    	--bg-color: #121212;
-    	--text-color: white;
-    	--panel-bg: #1e1e1e;
-    	--beam-color: rgba(0, 255, 255, 0.5);
-	}
-
+	       /* 🎨 Global Styles */
 	body {
-    	background-color: var(--bg-color);
-    	color: var(--text-color);
-    	transition: background 0.3s ease, color 0.3s ease;
+	    text-align: center;
+	    font-family: Arial, sans-serif;
+	    background-color: var(--bg-color);
+	    color: var(--text-color);
+	    transition: background 0.3s ease, color 0.3s ease;
 	}
-
-	.details-panel {
-    	background-color: var(--panel-bg);
-    	color: var(--text-color);
-    	border: 1px solid #666;
+	
+	.wrapper {
+	    display: flex;
+	    flex-direction: column;
+	    align-items: center;
+	    justify-content: center;
 	}
-
+	
+	/* 📏 Fix Image and Beams Alignment */
+	.container {
+	    position: relative;
+	    display: flex;
+	    justify-content: center; /* Centers horizontally */
+	    align-items: center; /* Centers vertically */
+	    flex-direction: column;
+	    margin: auto;
+	    max-width: 600px; /* Adjust width based on structure */
+	}
+	
+	img {
+	    display: block;
+	    max-width: 100%;
+	    height: auto;
+	    margin: 0 auto;
+	}
+	
+	/* 🎯 Beam Highlight & Selection Effects */
 	.beam {
-    	background-color: var(--beam-color);
+	    position: absolute;
+	    transition: all 0.3s ease-in-out;
+	    transform-origin: center;
+	    background-color: var(--beam-color);
+	    cursor: pointer;
+	    touch-action: manipulation;
 	}
-
-	.toggle-btn {
-    	position: absolute;
-    	top: 10px;
-    	right: 10px;
-    	background: #444;
-    	color: white;
-    	padding: 8px 12px;
-    	border: none;
-    	cursor: pointer;
-    	border-radius: 5px;
-    	font-size: 14px;
-    	transition: background 0.3s ease;
+	
+	.beam.selected {
+	    transform: scale(1.05);
+	    box-shadow: 0 0 10px rgba(0, 255, 0, 0.8);
 	}
-
-	.toggle-btn:hover {
-    	background: #666;
+	
+	.beam.highlight {
+	    border: 3px solid yellow !important;
 	}
-
-	#beam-legend {
-    	text-align: center;
-    	margin-top: 15px;
-   	padding: 10px;
-    	background: #f5f5f5;
-    	border-radius: 10px;
-    	display: inline-block;
-	}
-
-	.legend-item {
-    	display: flex;
-    	align-items: center;
-    	margin: 5px;
-    	font-size: 14px;
-	}
-
-	.legend-color {
-    	width: 20px;
-    	height: 20px;
-    	margin-right: 10px;
-    	display: inline-block;
-    	border-radius: 5px;
-	}
-
+	
+	/* 🔥 Tooltip Styling */
 	.beam-tooltip {
-    	position: absolute;
-    	background: #222;
-    	color: white;
-    	padding: 5px 10px;
-    	border-radius: 5px;
-    	font-size: 12px;
-    	display: none;
-    	box-shadow: 0 0 5px rgba(0,0,0,0.5);
+	    position: absolute;
+	    background: #222;
+	    color: white;
+	    padding: 5px 10px;
+	    border-radius: 5px;
+	    font-size: 12px;
+	    display: none;
+	    box-shadow: 0 0 5px rgba(0,0,0,0.5);
 	}
-
+	
+	/* 📌 Beam Details Panel */
+	.details-panel {
+	    position: absolute;
+	    background: var(--panel-bg);
+	    color: var(--text-color);
+	    border: 1px solid #666;
+	    padding: 10px;
+	    border-radius: 5px;
+	    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+	    display: none;
+	    z-index: 1000;
+	    font-size: 14px;
+	    transition: opacity 0.2s ease-in-out;
+	    max-width: 250px;
+	}
+	
+	/* ✅ Search Bar */
+	#beamSearch {
+	    width: 300px;
+	    padding: 8px;
+	    margin-bottom: 10px;
+	    font-size: 14px;
+	}
+	
+	/* ✅ Status and Progress Messages */
+	#beam-info {
+	    margin-top: 10px;
+	    font-size: 18px;
+	    font-weight: bold;
+	}
+	
+	#statusMessage {
+	    margin-top: 10px;
+	    font-size: 16px;
+	    font-weight: bold;
+	    color: darkblue;
+	}
+	
+	/* 🎚️ Progress Bar Styling */
+	#progress-container {
+	    text-align: center;
+	    margin-top: 20px;
+	}
+	
+	#progressBar {
+	    width: 0%;
+	    height: 30px;
+	    background-color: green;
+	    text-align: center;
+	    color: white;
+	    border-radius: 10px;
+	    transition: width 0.5s ease-in-out;
+	}
+	
+	/* 🌙 Dark Mode */
+	:root {
+	    --bg-color: white;
+	    --text-color: black;
+	    --panel-bg: white;
+	    --beam-color: rgba(255, 0, 0, 0.5);
+	}
+	
+	.dark-mode {
+	    --bg-color: #121212;
+	    --text-color: white;
+	    --panel-bg: #1e1e1e;
+	    --beam-color: rgba(0, 255, 255, 0.5);
+	}
+	
+	/* 🎭 Toggle Button */
+	.toggle-btn {
+	    position: absolute;
+	    top: 10px;
+	    right: 10px;
+	    background: #444;
+	    color: white;
+	    padding: 8px 12px;
+	    border: none;
+	    cursor: pointer;
+	    border-radius: 5px;
+	    font-size: 14px;
+	    transition: background 0.3s ease;
+	}
+	
+	.toggle-btn:hover {
+	    background: #666;
+	}
+	
+	/* 🎨 Beam Legend */
+	#beam-legend {
+	    text-align: center;
+	    margin-top: 15px;
+	    padding: 10px;
+	    background: #f5f5f5;
+	    border-radius: 10px;
+	    display: inline-block;
+	}
+	
+	.legend-item {
+	    display: flex;
+	    align-items: center;
+	    margin: 5px;
+	    font-size: 14px;
+	}
+	
+	.legend-color {
+	    width: 20px;
+	    height: 20px;
+	    margin-right: 10px;
+	    display: inline-block;
+	    border-radius: 5px;
+	}
+	
+	/* 📱 Mobile Optimization */
+	@media (max-width: 768px) {
+	    .container {
+	        width: 100%;
+	    }
+	
+	    img {
+	        max-width: 100%;
+	        height: auto;
+	    }
+	
+	    .details-panel {
+	        position: fixed;
+	        top: 50%;
+	        left: 50%;
+	        transform: translate(-50%, -50%);
+	        width: 90%;
+	        max-width: 300px;
+	    }
+	
+	    .beam {
+	        cursor: pointer;
+	    }
+	}
 
     </style>
 </head>
