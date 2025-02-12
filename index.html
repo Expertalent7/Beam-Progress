@@ -326,25 +326,26 @@
     };
 
     // 🎯 Show Beam Details on Click
-    beams.forEach(beam => {
-        beam.addEventListener("click", function (event) {
-            let beamName = this.getAttribute("data-name");
-            let beamStatus = this.classList.contains("selected") ? "Installed" : "Not Installed";
+    // 🎯 Show Beam Details on Click
+	beams.forEach(beam => {
+    	beam.addEventListener("click", function (event) {
+        let beamName = this.getAttribute("data-name");
+        let beamStatus = this.classList.contains("selected") ? "Installed" : "Not Installed";
+        let beamWeight = this.getAttribute("data-weight") || "Unknown"; // Get weight from the attribute
 
-            // Example Data (Replace with backend values)
-            document.getElementById("beamName").innerText = beamName;
-            document.getElementById("beamStatus").innerText = beamStatus;
-            document.getElementById("beamWeight").innerText = "500 kg"; // Placeholder
-            document.getElementById("beamLastScanned").innerText = new Date().toLocaleString();
+        document.getElementById("beamName").innerText = beamName;
+        document.getElementById("beamStatus").innerText = beamStatus;
+        document.getElementById("beamWeight").innerText = `${beamWeight} kg`; // Display correct weight
+        document.getElementById("beamLastScanned").innerText = new Date().toLocaleString();
 
-            // 🔄 Adjust Position Based on Device Type
-            let isMobile = window.innerWidth <= 768;
-            beamDetailsPanel.style.left = isMobile ? "50%" : `${event.pageX + 10}px`;
-            beamDetailsPanel.style.top = isMobile ? "50%" : `${event.pageY + 10}px`;
-            beamDetailsPanel.style.transform = isMobile ? "translate(-50%, -50%)" : "";
-            beamDetailsPanel.style.display = "block";
-        });
+        let isMobile = window.innerWidth <= 768;
+        beamDetailsPanel.style.left = isMobile ? "50%" : `${event.pageX + 10}px`;
+        beamDetailsPanel.style.top = isMobile ? "50%" : `${event.pageY + 10}px`;
+        beamDetailsPanel.style.transform = isMobile ? "translate(-50%, -50%)" : "";
+        beamDetailsPanel.style.display = "block";
     });
+});
+
 
     // ❌ Close Panel When Clicking Outside
     document.addEventListener("click", function (event) {
@@ -367,40 +368,42 @@
 
     // 🔄 Fetch Beam Status
     async function fetchBeamStatus() {
-        if (!statusMessage || !progressText || !progressBar) {
-            console.error("❌ Error: Required elements (statusMessage, progress, progressBar) not found!");
-            return;
-        }
-
-        statusMessage.innerText = "Updating beam status...";
-
-        try {
-            const response = await fetch("https://script.google.com/macros/s/AKfycbymfNB5JLWgCXVNSAMvJI2wBUT9XBGGDUun96rjMQxeqUxQOZoixkMrayBir9pJ0DLLSw/exec");
-            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-            const data = await response.json();
-
-            data.beams.forEach(beam => {
-                let beamElement = document.querySelector(`.beam[data-name="${beam.Beam_Name.trim().toLowerCase()}"]`);
-                if (beamElement) {
-                    beamElement.classList.toggle("selected", beam.Scanned === true || beam.Scanned === "TRUE");
-                } else {
-                    console.warn(`⚠ Beam '${beam.Beam_Name}' not found in the document.`);
-                }
-            });
-
-            if (data.progress !== undefined) {
-                let progressValue = parseFloat(data.progress).toFixed(2);
-                progressText.innerText = `Installation Progress: ${progressValue}%`;
-                progressBar.style.width = `${progressValue}%`;
-                progressBar.innerText = `${progressValue}%`;
-            }
-
-        } catch (error) {
-            console.error("❌ Error fetching beam data:", error);
-        } finally {
-            statusMessage.innerText = "Beam status updated!";
-        }
+    if (!statusMessage || !progressText || !progressBar) {
+        console.error("❌ Error: Required elements (statusMessage, progress, progressBar) not found!");
+        return;
     }
+
+    statusMessage.innerText = "Updating beam status...";
+
+    try {
+        const response = await fetch("https://script.google.com/macros/s/AKfycbymfNB5JLWgCXVNSAMvJI2wBUT9XBGGDUun96rjMQxeqUxQOZoixkMrayBir9pJ0DLLSw/exec");
+        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+        const data = await response.json();
+
+        data.beams.forEach(beam => {
+            let beamElement = document.querySelector(`.beam[data-name="${beam.Beam_Name.trim().toLowerCase()}"]`);
+            if (beamElement) {
+                beamElement.classList.toggle("selected", beam.Scanned === true || beam.Scanned === "TRUE");
+
+                // Store weight dynamically in beam attributes
+                beamElement.setAttribute("data-weight", beam.Weight);
+            }
+        });
+
+        if (data.progress !== undefined) {
+            let progressValue = parseFloat(data.progress).toFixed(2);
+            progressText.innerText = `Installation Progress: ${progressValue}%`;
+            progressBar.style.width = `${progressValue}%`;
+            progressBar.innerText = `${progressValue}%`;
+        }
+
+    	} catch (error) {
+        console.error("❌ Error fetching beam data:", error);
+    	} finally {
+        statusMessage.innerText = "Beam status updated!";
+    }
+}
+
 
     // 🎯 Tooltip for Beam Info on Hover
     const tooltip = document.createElement("div");
