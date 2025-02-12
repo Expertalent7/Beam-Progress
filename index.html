@@ -70,7 +70,11 @@
     <h1>Beam Selection Tool</h1>
 
     <!-- Search Bar (Moved outside container to prevent layout shift) -->
-    <input type="text" id="beamSearch" placeholder="Search beam..." onkeyup="searchBeam()">
+    <div style="display: flex; justify-content: center; align-items: center; margin-bottom: 10px;">
+    <input type="text" id="beamSearch" placeholder="Search beam..." onkeyup="searchBeam()" style="flex-grow: 1; padding: 8px;">
+    <button onclick="clearSearch()" style="padding: 8px; margin-left: 5px; cursor: pointer;">❌</button>
+    </div>
+
 
     <div class="wrapper">
         <div class="container">
@@ -129,18 +133,24 @@
     <p id="statusMessage">Loading beam status...</p>
 
     <script>
-        function searchBeam() {
-    let input = document.getElementById("beamSearch").value.toLowerCase().trim();
+       function searchBeam() {
+    let input = document.getElementById("beamSearch").value.toLowerCase();
     let beams = document.querySelectorAll(".beam");
 
     beams.forEach(beam => {
-        let beamName = beam.getAttribute("data-name").toLowerCase().trim();
+        let beamName = beam.getAttribute("data-name").toLowerCase();
         if (beamName.includes(input) && input !== "") {
             beam.classList.add("highlight");
         } else {
             beam.classList.remove("highlight");
         }
     });
+}
+
+// Clear the search field and reset highlights
+function clearSearch() {
+    document.getElementById("beamSearch").value = ""; // Clear text
+    document.querySelectorAll(".beam").forEach(beam => beam.classList.remove("highlight")); // Remove highlights
 }
 
 
