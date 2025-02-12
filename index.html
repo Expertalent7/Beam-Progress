@@ -366,14 +366,14 @@
         let beamName = this.getAttribute("data-name");
         let beamStatus = this.classList.contains("selected") ? "Installed" : "Not Installed";
         let beamWeight = this.getAttribute("data-weight") || "Unknown"; 
-	let beamProgress = this.dataset.progress || "0";  // ✅ Retrieve stored progress
+	let beamProgress = this.dataset.progress || "0";  // ✅ Fix: Default to 0% if undefined
         let beamQRCode = this.dataset.qrCode || ""; // ✅ Correctly fetch QR Code from dataset
 
         // Update details panel
         document.getElementById("beamName").innerText = beamName;
         document.getElementById("beamStatus").innerText = beamStatus;
         document.getElementById("beamWeight").innerText = `${beamWeight} kg`;
-	document.getElementById("beamProgress").innerText = `${beamProgress}%`; // ✅ Show progress
+	document.getElementById("beamProgress").innerText = `${beamProgress}%`; // ✅ Fix applied
         document.getElementById("beamLastScanned").innerText = new Date().toLocaleString();
 
         // ✅ Correctly set QR Code image and link
@@ -444,7 +444,7 @@
                 beamElement.setAttribute("data-weight", beam.Weight);
 
 		// ✅ Store individual progress
-		beamElement.dataset.progress = beam.Progress;
+		beamElement.dataset.progress = beam.Progress || "0";  // ✅ Fix: Ensure Progress is set
 
                 // ✅ Set QR Code dynamically from API
                 beamElement.dataset.qrCode = beam.QR_Code || ""; 
