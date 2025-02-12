@@ -63,7 +63,35 @@
     	z-index: 1000;
     	font-size: 14px;
     	transition: opacity 0.2s ease-in-out;
+    	max-width: 250px;
 	}
+
+	/* 📱 Mobile Responsive Styles */
+	@media (max-width: 768px) {
+    	.container {
+        width: 100%;
+    	}
+
+    	img {
+        max-width: 100%;
+        height: auto;
+    	}
+
+    	.details-panel {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 90%;
+        max-width: 300px;
+    	}
+
+    	.beam {
+        cursor: pointer;
+        touch-action: manipulation;
+    	}
+	}
+
 
     </style>
 </head>
@@ -160,7 +188,7 @@ function clearSearch() {
             document.getElementById("beamDetailsPanel").style.display = "none";
         }
 
-        document.addEventListener("DOMContentLoaded", function () {
+       	document.addEventListener("DOMContentLoaded", function () {
     	document.querySelectorAll('.beam').forEach(beam => {
         beam.addEventListener('click', function (event) {
             let beamName = this.getAttribute('data-name');
@@ -177,21 +205,32 @@ function clearSearch() {
             document.getElementById("beamWeight").innerText = beamWeight;
             document.getElementById("beamLastScanned").innerText = beamLastScanned;
 
-            // Position the panel near the click event
-            panel.style.display = "block";
-            panel.style.left = `${event.pageX + 10}px`;
-            panel.style.top = `${event.pageY + 10}px`;
-            });
-    	    });
+            // 🔄 Detect if user is on mobile
+            let isMobile = window.innerWidth <= 768;
+            if (isMobile) {
+                // Center the panel on mobile
+                panel.style.left = "50%";
+                panel.style.top = "50%";
+                panel.style.transform = "translate(-50%, -50%)";
+            } else {
+                // Position the panel near the click event (Desktop)
+                panel.style.left = `${event.pageX + 10}px`;
+                panel.style.top = `${event.pageY + 10}px`;
+            }
 
-    // Close the panel when clicking outside
-    document.addEventListener("click", function (event) {
+            panel.style.display = "block";
+        	});
+    	});
+
+    	// Close the panel when clicking outside
+    	document.addEventListener("click", function (event) {
         let panel = document.getElementById("beamDetailsPanel");
         if (!panel.contains(event.target) && !event.target.classList.contains("beam")) {
             panel.style.display = "none";
         }
-    });
-});
+    	});
+	});
+
 
 
         async function fetchBeamStatus() {
