@@ -18,17 +18,21 @@
             position: relative;
             display: inline-block;
         }
-	.beam.highlight {
-    	    border: 3px solid yellow !important;
-    	    box-shadow: 0px 0px 10px yellow;
+	.beam {
+    	transition: all 0.3s ease-in-out;
 	}
 
-        .beam {
-            position: absolute;
-            background-color: rgba(255, 0, 0, 0.5); /* Red transparent overlay */
-            cursor: pointer;
-            border: 1px solid black;
-        }
+	.beam.selected {
+    	transform: scale(1.05);
+    	box-shadow: 0 0 10px rgba(0, 255, 0, 0.8);
+	}
+
+	.beam.highlight {
+    	transition: all 0.3s ease-in-out;
+    	border: 3px solid yellow !important;
+	}
+
+        
         .beam:hover {
             background-color: rgba(0, 0, 255, 0.5); /* Blue on hover */
         }
@@ -140,6 +144,41 @@
     	background: #666;
 	}
 
+	#beam-legend {
+    	text-align: center;
+    	margin-top: 15px;
+   	padding: 10px;
+    	background: #f5f5f5;
+    	border-radius: 10px;
+    	display: inline-block;
+	}
+
+	.legend-item {
+    	display: flex;
+    	align-items: center;
+    	margin: 5px;
+    	font-size: 14px;
+	}
+
+	.legend-color {
+    	width: 20px;
+    	height: 20px;
+    	margin-right: 10px;
+    	display: inline-block;
+    	border-radius: 5px;
+	}
+
+	.beam-tooltip {
+    	position: absolute;
+    	background: #222;
+    	color: white;
+    	padding: 5px 10px;
+    	border-radius: 5px;
+    	font-size: 12px;
+    	display: none;
+    	box-shadow: 0 0 5px rgba(0,0,0,0.5);
+	}
+
 
     </style>
 </head>
@@ -189,6 +228,18 @@
     </div>
 
     </div>
+    <div id="beam-legend">
+    <h3>Beam Status Legend</h3>
+    <div class="legend-item">
+        <span class="legend-color" style="background-color: rgba(0, 255, 0, 0.7);"></span> Installed
+    </div>
+    <div class="legend-item">
+        <span class="legend-color" style="background-color: rgba(255, 0, 0, 0.5);"></span> Not Installed
+    </div>
+    <div class="legend-item">
+        <span class="legend-color" style="border: 3px solid yellow;"></span> Search Highlight
+    </div>
+</div>
 
     <!-- Beam Details Panel (Dynamic Positioning) -->
     <div id="beamDetailsPanel" class="details-panel" style="display: none;">
@@ -317,6 +368,26 @@
             statusMessage.innerText = "Beam status updated!";
         }
     }
+	const tooltip = document.createElement("div");
+	tooltip.classList.add("beam-tooltip");
+	document.body.appendChild(tooltip);
+
+	document.querySelectorAll(".beam").forEach(beam => {
+    	beam.addEventListener("mouseenter", (e) => {
+        let beamName = e.target.getAttribute("data-name");
+        let beamStatus = e.target.classList.contains("selected") ? "Installed" : "Not Installed";
+
+        tooltip.innerText = `${beamName} - ${beamStatus}`;
+        tooltip.style.left = `${e.pageX + 10}px`;
+        tooltip.style.top = `${e.pageY + 10}px`;
+        tooltip.style.display = "block";
+    	});
+
+    	beam.addEventListener("mouseleave", () => {
+        tooltip.style.display = "none";
+    });
+});
+
 
     // 🔄 Refresh every 5 seconds
     setInterval(fetchBeamStatus, 5000);
