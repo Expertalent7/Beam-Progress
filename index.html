@@ -312,6 +312,7 @@
     <p><strong>Name:</strong> <span id="beamName"></span></p>
     <p><strong>Status:</strong> <span id="beamStatus"></span></p>
     <p><strong>Weight:</strong> <span id="beamWeight"></span></p>
+    <p><strong>Progress:</strong> <span id="beamProgress"></span>%</p>
     <p><strong>Last Scanned:</strong> <span id="beamLastScanned"></span></p>
     <p><strong>QR Code:</strong></p>
     <a id="beamQRCodeLink" href="#" target="_blank">
@@ -365,12 +366,14 @@
         let beamName = this.getAttribute("data-name");
         let beamStatus = this.classList.contains("selected") ? "Installed" : "Not Installed";
         let beamWeight = this.getAttribute("data-weight") || "Unknown"; 
+	let beamProgress = this.dataset.progress || "0";  // ✅ Retrieve stored progress
         let beamQRCode = this.dataset.qrCode || ""; // ✅ Correctly fetch QR Code from dataset
 
         // Update details panel
         document.getElementById("beamName").innerText = beamName;
         document.getElementById("beamStatus").innerText = beamStatus;
         document.getElementById("beamWeight").innerText = `${beamWeight} kg`;
+	document.getElementById("beamProgress").innerText = `${beamProgress}%`; // ✅ Show progress
         document.getElementById("beamLastScanned").innerText = new Date().toLocaleString();
 
         // ✅ Correctly set QR Code image and link
@@ -440,6 +443,9 @@
                 // ✅ Set Weight dynamically
                 beamElement.setAttribute("data-weight", beam.Weight);
 
+		// ✅ Store individual progress
+		beamElement.dataset.progress = beam.Progress;
+
                 // ✅ Set QR Code dynamically from API
                 beamElement.dataset.qrCode = beam.QR_Code || ""; 
             }
@@ -489,9 +495,6 @@
     });
 });
 
-// 🔄 Fetch Beam Status Every 5 Seconds
-setInterval(fetchBeamStatus, 5000);
-fetchBeamStatus();
 
     // 🔄 Refresh Beam Status Every 5 Seconds
     setInterval(fetchBeamStatus, 5000);
