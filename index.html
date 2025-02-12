@@ -71,6 +71,29 @@
 	    <div class="beam" style="top: 499px; left: 393px; width: 5px; height: 63px;" data-name="beam y"></div>
 	    <div class="beam" style="top: 563px; left: 393px; width: 5px; height: 53px;" data-name="beam z"></div>
     </div>
+    <!-- Beam Details Panel -->
+    <div id="beamDetailsPanel" class="details-panel">
+    <h3>Beam Details</h3>
+    <p><strong>Name:</strong> <span id="beamName"></span></p>
+    <p><strong>Status:</strong> <span id="beamStatus"></span></p>
+    <p><strong>Weight:</strong> <span id="beamWeight"></span></p>
+    <p><strong>Last Scanned:</strong> <span id="beamLastScanned"></span></p>
+    <button onclick="closePanel()">Close</button>
+    </div>
+
+    <style>
+    .details-panel {
+    position: absolute;
+    top: 50px;
+    right: 20px;
+    width: 250px;
+    background: white;
+    border: 1px solid #ccc;
+    padding: 15px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    display: none;
+   }
+   </style>
 
     <div id="beam-info">Click on a beam to see details</div>
     <h2 id="progress">Installation Progress: 0%</h2>
@@ -86,9 +109,32 @@
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-    fetchBeamStatus(); // Initial fetch
-    setInterval(fetchBeamStatus, 5000); // Refresh progress every 5 seconds
+    document.querySelectorAll('.beam').forEach(beam => {
+        beam.addEventListener('click', function () {
+            let beamName = this.getAttribute('data-name');
+            let beamStatus = this.classList.contains("selected") ? "Installed" : "Not Installed";
+            
+            // Example data (you can fetch real data from the backend)
+            let beamWeight = "500 kg";  // Example, replace with real data
+            let beamLastScanned = new Date().toLocaleString(); // Example
+
+            // Update panel
+            document.getElementById("beamName").innerText = beamName;
+            document.getElementById("beamStatus").innerText = beamStatus;
+            document.getElementById("beamWeight").innerText = beamWeight;
+            document.getElementById("beamLastScanned").innerText = beamLastScanned;
+            
+            // Show the panel
+            document.getElementById("beamDetailsPanel").style.display = "block";
+        });
+    });
 });
+
+// Close Panel Function
+function closePanel() {
+    document.getElementById("beamDetailsPanel").style.display = "none";
+}
+
 
 async function fetchBeamStatus() {
     let statusMessage = document.getElementById("statusMessage");
