@@ -415,7 +415,7 @@
     statusMessage.innerText = "Updating beam status...";
 
     try {
-        const response = await fetch("https://script.google.com/macros/s/YOUR_SCRIPT_URL_HERE");
+        const response = await fetch("https://script.google.com/macros/s/AKfycbyc6jZTaht-j_xMhZUt2oZDplVUyicyVfjhnfoDKbeAkKLI9Tvy1vPGLgq9CKtvkaNfOg/exec");
         if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
         const data = await response.json();
 
