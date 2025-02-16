@@ -412,65 +412,25 @@ async function fetchBeamStatus() {
     try {
         const response = await fetch("https://script.google.com/macros/s/AKfycbx2gulg9vrRGxgzwBwZA3GpKjawfVZwiuPSrfd75d7w_mDaSHq_W6sd55RXifaxjRd_ZQ/exec");
 
-        if (!response.ok) {
-            throw new Error(`❌ HTTP error! Status: ${response.status}`);
-        }
+        if (!response.ok) throw new Error(`❌ HTTP error! Status: ${response.status}`);
 
         const text = await response.text();
         console.log("🛠 Raw API Response (Before Parsing):", text);
 
-        let data;
-        try {
-            window.beamData = JSON.parse(text); // Store globally
-	    console.log("✅ Beam data stored globally:", window.beamData);
+        if (!text.trim()) throw new Error("❌ API returned an empty response!");
 
-        } catch (jsonError) {
-            console.error("❌ JSON Parsing Error:", jsonError.message);
-            console.error("🚨 Raw Response that caused the error:", text);
-            return;
-        }
+        window.beamData = JSON.parse(text); // ✅ Store globally
 
-        // ✅ Debugging - Log beams and progress separately
-        console.log("🛠 Beams Data:", data.beams);
-        console.log("🛠 Overall Progress:", data.progress);
-
-        // ✅ Ensure valid beam data is present
-        if (!data.beams || !Array.isArray(data.beams)) {
-            throw new Error("❌ Error: Invalid or missing beams data!");
-        }
-
-        // ✅ Update Beam Elements on Web Page
-        document.querySelectorAll(".beam").forEach(beamElement => {
-            let beamName = beamElement.dataset.name?.toLowerCase().trim();
-            let beamData = data.beams.find(b => b.Beam_ID.toLowerCase().trim() === beamName);
-
-            if (beamData) {
-                beamElement.classList.toggle("selected", beamData.Progress > 0);
-                beamElement.dataset.progress = beamData.Progress.toFixed(2);
-                console.log(`✅ Updated beam ${beamName} - Progress: ${beamData.Progress.toFixed(2)}`);
-            } else {
-                beamElement.classList.remove("selected");
-                console.log(`🚨 Beam ${beamName} not found in API data`);
-            }
-        });
-
-        // ✅ Update Installation Progress Bar
-        if (data.progress !== undefined) {
-            let progressValue = parseFloat(data.progress).toFixed(2);
-            document.getElementById("progress").innerText = `Installation Progress: ${progressValue}%`;
-            document.getElementById("progressBar").style.width = `${progressValue}%`;
-            document.getElementById("progressBar").innerText = `${progressValue}%`;
-            console.log(`✅ Updated Progress Bar: ${progressValue}%`);
-        }
-
+        console.log("✅ JSON Parsed Successfully:", window.beamData);
+        
     } catch (error) {
         console.error("❌ Error fetching beam data:", error);
     }
 }
 
-// 🔄 Run Fetch Function
+// 🔄 Call Fetch Function
 fetchBeamStatus();
-setInterval(fetchBeamStatus, 5000);
+
 
 
 
