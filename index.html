@@ -406,36 +406,68 @@
     });
 
     // 🔄 Fetch Beam Status
-
 async function fetchBeamStatus() {
     console.log("🔄 Fetching beam status...");
 
     try {
         const response = await fetch("https://script.google.com/macros/s/AKfycbx2gulg9vrRGxgzwBwZA3GpKjawfVZwiuPSrfd75d7w_mDaSHq_W6sd55RXifaxjRd_ZQ/exec");
+        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
 
-        if (!response.ok) throw new Error(`❌ HTTP error! Status: ${response.status}`);
+        const data = await response.json();
+        console.log("✅ JSON Parsed Successfully:", data);
 
-        const text = await response.text();
-        console.log("🛠 Raw API Response (Before Parsing):", text);
-
-        if (!text.trim()) throw new Error("❌ API returned an empty response!");
-
-        window.beamData = JSON.parse(text); // ✅ Store globally
-
-        console.log("✅ JSON Parsed Successfully:", window.beamData);
-
-        // ✅ Verify if beams array is present
-        if (!window.beamData.beams || !Array.isArray(window.beamData.beams)) {
-            console.error("❌ beams array is missing in beamData!", window.beamData);
+        if (!data || !data.beams) {
+            throw new Error("❌ Invalid beam data structure!");
         }
+
+        // Assign globally AFTER validation
+        window.beamData = data;
+        console.log("✅ beamData is now set:", window.beamData);
+
+        // ✅ Ensure UI updates AFTER data is ready
+        updateBeamUI();
 
     } catch (error) {
         console.error("❌ Error fetching beam data:", error);
     }
 }
 
-// 🔄 Run Fetch
+// Ensure UI updates only when data is available
+function updateBeamUI() {
+    if (!window.beamData || !window.beamData.beams) {
+        console.warn("⚠ beamData is not ready yet!");
+        return;
+    }
+
+    console.log("✅ Updating UI with:", window.beamData);
+    document.querySelectorAll(".beam").forEach(beamElement => {
+        let beamName = beamElement.dataset.name?.toLowerCase().trim();
+        let beamDataEntry = window.beamData.beams.find(b => b.Beam_Name.toLowerCase().trim() === beamName);
+
+        if (beamDataEntry) {
+            beamElement.classList.toggle("selected", beamDataEntry.Progress > 0);
+            beamElement.dataset.progress = beamDataEntry.Progress.toFixed(2);
+            beamElement.dataset.qrCode = beamDataEntry.QR_Code;
+            console.log(`✅ Updated ${beamName} with Progress ${beamDataEntry.Progress}`);
+        } else {
+            beamElement.classList.remove("selected");
+            console.log(`⚠ No matching data for ${beamName}`);
+        }
+    });
+
+    // Update progress bar
+    let progressText = document.getElementById("progress");
+    let progressBar = document.getElementById("progressBar");
+    let progressValue = parseFloat(window.beamData.progress).toFixed(2);
+    progressText.innerText = `Installation Progress: ${progressValue}%`;
+    progressBar.style.width = `${progressValue}%`;
+    progressBar.innerText = `${progressValue}%`;
+}
+
+// 🔄 Run Fetch Function
 fetchBeamStatus();
+setInterval(fetchBeamStatus, 5000);
+
 
 
 
