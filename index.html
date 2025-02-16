@@ -384,7 +384,12 @@
             document.getElementById("beamWeight").innerText = beamWeight; // ✅ Fixed weight
             document.getElementById("beamProgress").innerText = `${beamProgress}%`;
             document.getElementById("beamQRCode").src = beamQRCode;
-
+  		
+	    let isMobile = window.innerWidth <= 768;
+            beamDetailsPanel.style.left = isMobile ? "50%" : `${event.pageX + 10}px`;
+            beamDetailsPanel.style.top = isMobile ? "50%" : `${event.pageY + 10}px`;
+            beamDetailsPanel.style.transform = isMobile ? "translate(-50%, -50%)" : "";
+          
             beamDetailsPanel.style.display = "block";
         } else {
             console.warn(`⚠ No matching data found for ${beamName}`);
@@ -392,13 +397,6 @@
     });
 });
 
-            let isMobile = window.innerWidth <= 768;
-            beamDetailsPanel.style.left = isMobile ? "50%" : `${event.pageX + 10}px`;
-            beamDetailsPanel.style.top = isMobile ? "50%" : `${event.pageY + 10}px`;
-            beamDetailsPanel.style.transform = isMobile ? "translate(-50%, -50%)" : "";
-            beamDetailsPanel.style.display = "block";
-        });
-    });
 
     // ❌ Close Panel When Clicking Outside
     document.addEventListener("click", function (event) {
