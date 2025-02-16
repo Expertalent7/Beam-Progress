@@ -418,10 +418,12 @@ async function fetchBeamStatus() {
 
         // ✅ Log raw response before parsing
         const text = await response.text();
-        console.log("🛠 Raw API Response:", text);
+        console.log("🛠 Raw API Response (Before Parsing):", text);
 
+        // ❌ If the response is empty, stop execution
         if (!text.trim()) {
-            throw new Error("❌ API returned an empty response!");
+            console.error("❌ API returned an empty response!");
+            return;
         }
 
         // ✅ Attempt to parse JSON
@@ -438,13 +440,11 @@ async function fetchBeamStatus() {
 
         // ✅ Ensure valid beam data is present
         if (!data.beams || !Array.isArray(data.beams)) {
-            throw new Error("❌ Error: Invalid or missing beams data!");
+            console.error("❌ Error: Invalid or missing beams data!");
+            return;
         }
 
-        // ✅ Check if beam data is empty
-        if (data.beams.length === 0) {
-            throw new Error("❌ Error: Beams array is empty!");
-        }
+        console.log("✅ Beam data received successfully:", data.beams);
 
     } catch (error) {
         console.error("❌ Error fetching beam data:", error);
