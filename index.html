@@ -405,31 +405,36 @@
     });
 
     // 🔄 Fetch Beam Status
-
-	async function fetchBeamStatus() {
+async function fetchBeamStatus() {
     if (!statusMessage || !progressText || !progressBar) {
-        console.error("❌ Error: Required elements (statusMessage, progress, progressBar) not found!");
+        console.error("❌ Error: Required elements (statusMessage, progressText, progressBar) not found!");
         return;
     }
 
     statusMessage.innerText = "Updating beam status...";
 
     try {
-        const response = await fetch("https://script.google.com/macros/s/AKfycbyLHbC6-U4RFvMZY797O2fjoaxhRVRGvbyjr64wW8IUhPMVG3Qhrw2S-KavlVycBvC03A/exec");
+        const response = await fetch("https://script.google.com/macros/s/AKfycbzHLTvg0hpL7cfO7ElHUF5FlTVTFnvcHOdW5wyfALer_Ydnkg6yiedxP_8NNXZltsoe0A/exec");
         if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+        
         const data = await response.json();
 
-        data.beams.forEach(beam => {
-            let beamElement = document.querySelector(`.beam[data-name="${beam.Beam_Name.trim().toLowerCase()}"]`);
-            
-            if (beamElement) {
-                beamElement.classList.toggle("selected", beam.Scanned === true || beam.Scanned === "TRUE");
+        document.querySelectorAll(".beam").forEach(beamElement => {
+            let beamName = beamElement.dataset.name.toLowerCase().trim();
+
+            let beamData = data.beams.find(b => b.Beam_Name.toLowerCase().trim() === beamName);
+
+            if (beamData) {
+                // ✅ Mark beam as "selected" if Progress > 0
+                beamElement.classList.toggle("selected", beamData.Progress > 0);
 
                 // ✅ Store the Progress value in dataset
-                beamElement.dataset.progress = beam.Progress;
+                beamElement.dataset.progress = beamData.Progress;
 
                 // ✅ Store the QR Code in dataset
-                beamElement.dataset.qrCode = beam.QR_Code;
+                beamElement.dataset.qrCode = beamData.QR_Code;
+            } else {
+                beamElement.classList.remove("selected");
             }
         });
 
@@ -447,42 +452,37 @@
     }
 }
 
+// 🎯 Tooltip for Beam Info on Hover
+const tooltip = document.createElement("div");
+tooltip.classList.add("beam-tooltip");
+document.body.appendChild(tooltip);
 
-	     
-	// 🎯 Tooltip for Beam Info on Hover
-	const tooltip = document.createElement("div");
-	tooltip.classList.add("beam-tooltip");
-	document.body.appendChild(tooltip);
-
-	beams.forEach(beam => {
-    	beam.addEventListener("mouseenter", (e) => {
-        let beamName = e.target.getAttribute("data-name");
+document.querySelectorAll(".beam").forEach(beam => {
+    beam.addEventListener("mouseenter", (e) => {
+        let beamName = e.target.dataset.name;
         let beamStatus = e.target.classList.contains("selected") ? "Installed" : "Not Installed";
 
-        // ✅ Display the tooltip with beam info
+        // ✅ Display tooltip with beam info
         tooltip.innerText = `${beamName} - ${beamStatus}`;
         tooltip.style.left = `${e.pageX + 10}px`;
         tooltip.style.top = `${e.pageY + 10}px`;
         tooltip.style.display = "block";
-    	});
+    });
 
-    	beam.addEventListener("mousemove", (e) => {
-        // ✅ Move tooltip with cursor
+    beam.addEventListener("mousemove", (e) => {
         tooltip.style.left = `${e.pageX + 10}px`;
         tooltip.style.top = `${e.pageY + 10}px`;
-    	});
+    });
 
-    	beam.addEventListener("mouseleave", () => {
-        // ❌ Hide tooltip when mouse leaves beam
+    beam.addEventListener("mouseleave", () => {
         tooltip.style.display = "none";
     });
 });
 
+// 🔄 Refresh Beam Status Every 5 Seconds
+setInterval(fetchBeamStatus, 5000);
+fetchBeamStatus();
 
-    // 🔄 Refresh Beam Status Every 5 Seconds
-    setInterval(fetchBeamStatus, 5000);
-    fetchBeamStatus();
-});
 
     </script>
 
