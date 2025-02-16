@@ -327,6 +327,7 @@
     <div id="beam-info">Click on a beam to see details</div>
 
     <script>
+	    
      document.addEventListener("DOMContentLoaded", function () {
     // 🔄 Cache frequently accessed elements
     const beamSearch = document.getElementById("beamSearch");
@@ -470,6 +471,7 @@ async function fetchBeamStatus() {
 // 🔄 Auto-fetch every 5 seconds
 fetchBeamStatus();
 setInterval(fetchBeamStatus, 5000);
+
 
 
 
