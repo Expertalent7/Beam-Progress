@@ -420,6 +420,7 @@ async function fetchBeamStatus() {
         const text = await response.text();
         console.log("🛠 Raw API Response:", text);
 
+        // ✅ Check if API returned an empty response
         if (!text.trim()) {
             throw new Error("❌ API returned an empty response!");
         }
@@ -471,7 +472,6 @@ async function fetchBeamStatus() {
 // 🔄 Auto-fetch every 5 seconds
 fetchBeamStatus();
 setInterval(fetchBeamStatus, 5000);
-
 
 
 
