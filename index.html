@@ -415,8 +415,10 @@ async function fetchBeamStatus() {
             throw new Error(`❌ HTTP error! Status: ${response.status}`);
         }
 
-        // ✅ Ensure response is not empty
+        // ✅ Log raw response before parsing
         const text = await response.text();
+        console.log("🛠 Raw API Response:", text);
+
         if (!text.trim()) {
             throw new Error("❌ API returned an empty response!");
         }
@@ -426,7 +428,9 @@ async function fetchBeamStatus() {
         try {
             data = JSON.parse(text);
         } catch (jsonError) {
-            throw new Error("❌ Error parsing JSON: " + jsonError.message);
+            console.error("❌ Error parsing JSON: ", jsonError.message);
+            console.error("🚨 Raw Response that caused the error: ", text);
+            return;
         }
 
         console.log("✅ JSON Data Received:", data);
@@ -466,6 +470,7 @@ async function fetchBeamStatus() {
 // 🔄 Auto-fetch every 5 seconds
 fetchBeamStatus();
 setInterval(fetchBeamStatus, 5000);
+
 
 
 
