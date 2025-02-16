@@ -451,30 +451,44 @@
     }
 
     function updateBeamUI() {
-        console.log("🔄 Updating Beam UI with Data...");
+    console.log("🔄 Updating Beam UI with Data...");
 
-        if (!window.beamData || !window.beamData.beams) {
-            console.warn("⚠ window.beamData is missing or has no beams!");
-            return;
-        }
-
-        document.querySelectorAll(".beam").forEach(beamElement => {
-            let beamName = beamElement.dataset.name?.toLowerCase().trim();
-            let beamDataEntry = window.beamData.beams.find(b =>
-                b.Beam_Name.toLowerCase().trim() === beamName
-            );
-
-            if (beamDataEntry) {
-                beamElement.classList.toggle("selected", beamDataEntry.Progress > 0);
-                beamElement.dataset.progress = beamDataEntry.Progress.toFixed(2);
-                beamElement.dataset.qrCode = beamDataEntry.QR_Code;
-                console.log(`✅ Updated ${beamName} with Progress ${beamDataEntry.Progress}`);
-            } else {
-                beamElement.classList.remove("selected");
-                console.warn(`⚠ No matching data for ${beamName}`);
-            }
-        });
+    if (!window.beamData || !window.beamData.beams) {
+        console.warn("⚠ window.beamData is missing or has no beams!");
+        return;
     }
+
+    document.querySelectorAll(".beam").forEach(beamElement => {
+        let beamName = beamElement.dataset.name?.toLowerCase().trim();
+        let beamDataEntry = window.beamData.beams.find(b => 
+            b.Beam_Name.toLowerCase().trim() === beamName
+        );
+
+        if (beamDataEntry) {
+            beamElement.classList.toggle("selected", beamDataEntry.Progress > 0);
+            beamElement.dataset.progress = beamDataEntry.Progress.toFixed(2);
+            beamElement.dataset.qrCode = beamDataEntry.QR_Code;
+
+            // ✅ Set color to green if installed (Progress > 0)
+            if (beamDataEntry.Progress > 0) {
+                beamElement.style.border = "3px solid green"; // Change color
+                beamElement.style.backgroundColor = "rgba(0, 255, 0, 0.3)"; // Light green background
+            } else {
+                beamElement.style.border = "3px solid red"; // Keep red for not installed
+                beamElement.style.backgroundColor = "rgba(255, 0, 0, 0.3)"; // Light red background
+            }
+
+            console.log(`✅ Updated ${beamName} with Progress ${beamDataEntry.Progress}`);
+        } else {
+            beamElement.classList.remove("selected");
+            console.warn(`⚠ No matching data for ${beamName}`);
+        }
+    });
+
+    // ✅ Update total installation progress
+    updateTotalProgress();
+}
+
 
     // 🎯 Tooltip for Beam Info on Hover
     const tooltip = document.createElement("div");
