@@ -422,11 +422,10 @@ async function fetchBeamStatus() {
 
         // ❌ If the response is empty, stop execution
         if (!text.trim()) {
-            console.error("❌ API returned an empty response!");
-            return;
+            throw new Error("❌ API returned an empty response!");
         }
 
-        // ✅ Validate if JSON is properly formatted
+        // ✅ Attempt to parse JSON
         let data;
         try {
             data = JSON.parse(text);
@@ -440,8 +439,7 @@ async function fetchBeamStatus() {
 
         // ✅ Ensure valid beam data is present
         if (!data.beams || !Array.isArray(data.beams)) {
-            console.error("❌ Error: Invalid or missing beams data!");
-            return;
+            throw new Error("❌ Error: Invalid or missing beams data!");
         }
 
         console.log("✅ Beam data received successfully:", data.beams);
