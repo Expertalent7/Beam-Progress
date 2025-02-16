@@ -366,19 +366,31 @@
     };
 
     // 🎯 Show Beam Details on Click
-    beams.forEach(beam => {
-        beam.addEventListener("click", function (event) {
-            let beamName = this.getAttribute("data-name");
-            let beamStatus = this.classList.contains("selected") ? "Installed" : "Not Installed";
-            let beamWeight = this.getAttribute("data-weight") || "Unknown";
-            let beamProgress = this.dataset.progress || "0";
-            let beamQRCode = this.dataset.qrCode || "https://via.placeholder.com/150";
+    document.querySelectorAll(".beam").forEach(beamElement => {
+    beamElement.addEventListener("click", function (event) {
+        let beamName = this.dataset.name;
+        let beamDataEntry = window.beamData.beams.find(b => 
+            b.Beam_Name.toLowerCase().trim() === beamName.toLowerCase().trim()
+        );
 
+        if (beamDataEntry) {
+            let beamStatus = beamDataEntry.Progress > 0 ? "Installed" : "Not Installed";
+            let beamWeight = beamDataEntry.Weight ? `${beamDataEntry.Weight} kg` : "Unknown kg"; // ✅ Fix weight display
+            let beamProgress = beamDataEntry.Progress.toFixed(2);
+            let beamQRCode = beamDataEntry.QR_Code || "https://via.placeholder.com/150";
+            
             document.getElementById("beamName").innerText = beamName;
             document.getElementById("beamStatus").innerText = beamStatus;
-            document.getElementById("beamWeight").innerText = `${beamWeight} kg`;
-            document.getElementById("beamProgress").innerText = beamProgress;
+            document.getElementById("beamWeight").innerText = beamWeight; // ✅ Fixed weight
+            document.getElementById("beamProgress").innerText = `${beamProgress}%`;
             document.getElementById("beamQRCode").src = beamQRCode;
+
+            beamDetailsPanel.style.display = "block";
+        } else {
+            console.warn(`⚠ No matching data found for ${beamName}`);
+        }
+    });
+});
 
             let isMobile = window.innerWidth <= 768;
             beamDetailsPanel.style.left = isMobile ? "50%" : `${event.pageX + 10}px`;
