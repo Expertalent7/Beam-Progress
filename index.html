@@ -409,7 +409,7 @@ async function fetchBeamStatus() {
     console.log("🔄 Fetching beam status...");
 
     try {
-        const response = await fetch("https://script.google.com/macros/s/AKfycbyLHbC6-U4RFvMZY797O2fjoaxhRVRGvbyjr64wW8IUhPMVG3Qhrw2S-KavlVycBvC03A/exec");
+        const response = await fetch("https://script.google.com/macros/s/AKfycbyMlEdx6JJsBiquIeCPlZFA0on4JA06iygSz2OdZaoPJsdW7oAfRn80grZshjNlkMEk2g/exec");
 
         if (!response.ok) {
             throw new Error(`❌ HTTP error! Status: ${response.status}`);
