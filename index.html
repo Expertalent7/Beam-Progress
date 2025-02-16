@@ -406,21 +406,27 @@
 
     // 🔄 Fetch Beam Status
 async function fetchBeamStatus() {
-    if (!statusMessage || !progressText || !progressBar) {
-        console.error("❌ Error: Required elements (statusMessage, progressText, progressBar) not found!");
-        return;
-    }
-
-    statusMessage.innerText = "Updating beam status...";
+    console.log("🔄 Fetching beam status...");
 
     try {
-        const response = await fetch("https://script.google.com/macros/s/AKfycbzHLTvg0hpL7cfO7ElHUF5FlTVTFnvcHOdW5wyfALer_Ydnkg6yiedxP_8NNXZltsoe0A/exec");
-        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-        
-        const data = await response.json();
+        const response = await fetch("https://script.google.com/macros/s/AKfycbyLHbC6-U4RFvMZY797O2fjoaxhRVRGvbyjr64wW8IUhPMVG3Qhrw2S-KavlVycBvC03A/exec");
 
+        if (!response.ok) {
+            throw new Error(`❌ HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log("✅ JSON Data Received:", data);
+
+        // Ensure we have beam data
+        if (!data.beams || !Array.isArray(data.beams)) {
+            console.error("❌ Error: Invalid beams data received!");
+            return;
+        }
+
+        // ✅ Loop through each beam element and update UI
         document.querySelectorAll(".beam").forEach(beamElement => {
-            let beamName = beamElement.dataset.name.toLowerCase().trim();
+            let beamName = beamElement.dataset.name?.toLowerCase().trim();
 
             let beamData = data.beams.find(b => b.Beam_Name.toLowerCase().trim() === beamName);
 
@@ -429,7 +435,7 @@ async function fetchBeamStatus() {
                 beamElement.classList.toggle("selected", beamData.Progress > 0);
 
                 // ✅ Store the Progress value in dataset
-                beamElement.dataset.progress = beamData.Progress;
+                beamElement.dataset.progress = beamData.Progress.toFixed(2);
 
                 // ✅ Store the QR Code in dataset
                 beamElement.dataset.qrCode = beamData.QR_Code;
@@ -438,6 +444,7 @@ async function fetchBeamStatus() {
             }
         });
 
+        // ✅ Update Installation Progress Bar
         if (data.progress !== undefined) {
             let progressValue = parseFloat(data.progress).toFixed(2);
             progressText.innerText = `Installation Progress: ${progressValue}%`;
@@ -447,10 +454,13 @@ async function fetchBeamStatus() {
 
     } catch (error) {
         console.error("❌ Error fetching beam data:", error);
-    } finally {
-        statusMessage.innerText = "Beam status updated!";
     }
 }
+
+// 🎯 Debugging: Call API on page load and refresh every 5 seconds
+fetchBeamStatus();
+setInterval(fetchBeamStatus, 5000);
+
 
 // 🎯 Tooltip for Beam Info on Hover
 const tooltip = document.createElement("div");
@@ -479,9 +489,8 @@ document.querySelectorAll(".beam").forEach(beam => {
     });
 });
 
-// 🔄 Refresh Beam Status Every 5 Seconds
-setInterval(fetchBeamStatus, 5000);
-fetchBeamStatus();
+
+
 
 
     </script>
