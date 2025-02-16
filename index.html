@@ -406,6 +406,7 @@
     });
 
     // 🔄 Fetch Beam Status
+
 async function fetchBeamStatus() {
     console.log("🔄 Fetching beam status...");
 
@@ -422,15 +423,19 @@ async function fetchBeamStatus() {
         window.beamData = JSON.parse(text); // ✅ Store globally
 
         console.log("✅ JSON Parsed Successfully:", window.beamData);
-        
+
+        // ✅ Verify if beams array is present
+        if (!window.beamData.beams || !Array.isArray(window.beamData.beams)) {
+            console.error("❌ beams array is missing in beamData!", window.beamData);
+        }
+
     } catch (error) {
         console.error("❌ Error fetching beam data:", error);
     }
 }
 
-// 🔄 Call Fetch Function
+// 🔄 Run Fetch
 fetchBeamStatus();
-
 
 
 
