@@ -444,6 +444,9 @@
 
             // ✅ Update UI
             updateBeamUI();
+	    // ✅ Update total installation progress
+    	    updateTotalProgress();
+		
 
         } catch (error) {
             console.error("❌ Error fetching beam data:", error);
@@ -485,8 +488,7 @@
         }
     });
 
-    // ✅ Update total installation progress
-    updateTotalProgress();
+    
 }
 
 function updateTotalProgress() {
