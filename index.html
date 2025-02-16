@@ -437,16 +437,17 @@ async function fetchBeamStatus() {
         console.log("✅ JSON Data Received:", data);
 
         // ✅ Assign Data to Global Window Object
-        window.beamData = data;  // Ensure data is saved globally
+        window.beamData = data;
         console.log("📌 window.beamData is now set:", window.beamData);
 
         // ✅ Update UI
-        updateBeamUI();  // Make sure this function exists
+        updateBeamUI();
 
     } catch (error) {
         console.error("❌ Error fetching beam data:", error);
     }
 }
+
 	     
 function updateBeamUI() {
     console.log("🔄 Updating Beam UI with Data...");
