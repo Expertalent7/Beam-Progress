@@ -441,6 +441,11 @@ async function fetchBeamStatus() {
             throw new Error("❌ Error: Invalid or missing beams data!");
         }
 
+        // ✅ Check if beam data is empty
+        if (data.beams.length === 0) {
+            throw new Error("❌ Error: Beams array is empty!");
+        }
+
     } catch (error) {
         console.error("❌ Error fetching beam data:", error);
     }
@@ -448,9 +453,6 @@ async function fetchBeamStatus() {
 
 // 🔄 Run Fetch Function
 fetchBeamStatus();
-
-
-
 
 
 
