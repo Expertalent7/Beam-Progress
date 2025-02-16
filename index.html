@@ -489,6 +489,21 @@
     updateTotalProgress();
 }
 
+function updateTotalProgress() {
+    if (!window.beamData || !window.beamData.progress) {
+        console.warn("⚠ No progress data found!");
+        return;
+    }
+
+    let totalProgress = parseFloat(window.beamData.progress).toFixed(2);
+    
+    // ✅ Update the text and progress bar
+    document.getElementById("progress").innerText = `Installation Progress: ${totalProgress}%`;
+    document.getElementById("progressBar").style.width = `${totalProgress}%`;
+    document.getElementById("progressBar").innerText = `${totalProgress}%`;
+
+    console.log(`📊 Updated Total Progress: ${totalProgress}%`);
+}
 
     // 🎯 Tooltip for Beam Info on Hover
     const tooltip = document.createElement("div");
