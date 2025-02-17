@@ -109,22 +109,29 @@
 	}
 	
 	/* 🎚️ Progress Bar Styling */
-	#progress-container {
-	    text-align: center;
-	    margin-top: 20px;
+	#progressContainer {
+    	width: 50%;  /* ✅ Make it half the page width */
+    	max-width: 400px; /* ✅ Set a max width */
+    	height: 20px; /* ✅ Reduce height */
+    	background-color: #ddd;
+    	border-radius: 10px; /* ✅ Rounded edges */
+    	overflow: hidden;
+    	margin: 10px auto; /* ✅ Center it */
+    	box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
 	}
-	
+
 	#progressBar {
-	    width: 100%;
-	    height: 20px; /* Increase height */
-    	    font-size: 14px; /* Make text larger */
-    	    font-weight: bold;
-	    background-color: green;
-	    text-align: center;
-	    color: white;
-	    border-radius: 10px;
-	    transition: width 0.5s ease-in-out;
+    	height: 100%;
+    	background-color: #4caf50; /* ✅ Green color */
+    	color: white;
+    	text-align: center;
+    	line-height: 20px;
+    	font-size: 14px;
+    	font-weight: bold;
+    	border-radius: 10px; /* ✅ Match container */
+    	transition: width 0.5s ease-in-out; /* ✅ Smooth animation */
 	}
+
 	
 	/* 🌙 Dark Mode */
 	:root {
@@ -278,14 +285,14 @@
         <div class="beam" style="top: 311px; left: 154px; width: 7px; height: 305px;" data-name="beam p"></div>
         <div class="beam" style="top: 311px; left: 295px; width: 7px; height: 305px;" data-name="beam q"></div>
         <div class="beam" style="top: 310px; left: 138px; width: 24px; height: 7px;" data-name="beam r"></div>
-	    <div class="beam" style="top: 124px; left: 393px; width: 5px; height: 65px;" data-name="beam s"></div>
-	    <div class="beam" style="top: 189px; left: 393px; width: 5px; height: 65px;" data-name="beam t"></div>
-	    <div class="beam" style="top: 252px; left: 393px; width: 5px; height: 60px;" data-name="beam u"></div>
-	    <div class="beam" style="top: 312px; left: 393px; width: 5px; height: 65px;" data-name="beam v"></div>
-	    <div class="beam" style="top: 376px; left: 393px; width: 5px; height: 65px;" data-name="beam w"></div>
-	    <div class="beam" style="top: 439px; left: 393px; width: 5px; height: 60px;" data-name="beam x"></div>
-	    <div class="beam" style="top: 499px; left: 393px; width: 5px; height: 63px;" data-name="beam y"></div>
-	    <div class="beam" style="top: 563px; left: 393px; width: 5px; height: 53px;" data-name="beam z"></div>
+	<div class="beam" style="top: 124px; left: 393px; width: 5px; height: 65px;" data-name="beam s"></div>
+	<div class="beam" style="top: 189px; left: 393px; width: 5px; height: 65px;" data-name="beam t"></div>
+	<div class="beam" style="top: 252px; left: 393px; width: 5px; height: 60px;" data-name="beam u"></div>
+	<div class="beam" style="top: 312px; left: 393px; width: 5px; height: 65px;" data-name="beam v"></div>
+	<div class="beam" style="top: 376px; left: 393px; width: 5px; height: 65px;" data-name="beam w"></div>
+	<div class="beam" style="top: 439px; left: 393px; width: 5px; height: 60px;" data-name="beam x"></div>
+	<div class="beam" style="top: 499px; left: 393px; width: 5px; height: 63px;" data-name="beam y"></div>
+	<div class="beam" style="top: 563px; left: 393px; width: 5px; height: 53px;" data-name="beam z"></div>
     	</div>
     </div>
 	
@@ -296,6 +303,11 @@
             0%
         </div>
     </div>
+
+    <div id="progressContainer">
+    <div id="progressBar">0%</div>
+    </div>
+    <p id="installationProgress">Installation Progress: 0%</p>
 
     <p id="statusMessage">Loading beam status...</p>
 
@@ -525,28 +537,39 @@ document.querySelectorAll(".beam").forEach(beamElement => {
 }
 
 function updateTotalProgress() {
-    if (!window.beamData || !window.beamData.beams) return;
-    
+    // ✅ Ensure beamData is properly defined
+    if (!window.beamData || !window.beamData.beams) {
+        console.error("❌ beamData is not available or missing 'beams' array!");
+        return;
+    }
+
     let totalWeight = 0;
     let installedWeight = 0;
 
     window.beamData.beams.forEach(beam => {
-        totalWeight += beam.Weight || 0; // ✅ Ensure no NaN errors
+        totalWeight += beam.Weight || 0; // ✅ Avoid NaN issues
         if (beam.Progress > 0) {
-            installedWeight += beam.Weight || 0; // ✅ Count installed weight
+            installedWeight += beam.Weight || 0;
         }
     });
 
     let overallProgress = totalWeight > 0 ? (installedWeight / totalWeight) * 100 : 0;
     
     // ✅ Update Progress Bar
-    document.getElementById("progressBar").style.width = `${overallProgress.toFixed(2)}%`;
-    document.getElementById("progressBar").innerText = `${overallProgress.toFixed(2)}%`;
-    document.getElementById("installationProgress").innerText = `Installation Progress: ${overallProgress.toFixed(2)}%`;
+    let progressBar = document.getElementById("progressBar");
+    let progressText = `${overallProgress.toFixed(2)}%`;
+
+    progressBar.style.width = `${overallProgress}%`;
+    progressBar.innerText = progressText;
+    document.getElementById("installationProgress").innerText = `Installation Progress: ${progressText}`;
+
+    console.log(`✅ Total progress updated to: ${progressText}`);
 }
 
-// ✅ Call function after fetching data
-fetchBeamStatus().then(updateTotalProgress);
+// ✅ Call function after data is fetched
+fetchBeamStatus().then(updateTotalProgress).catch(err => console.error("❌ Error fetching beam data:", err));
+
+
 
     // 🎯 Tooltip for Beam Info on Hover
     const tooltip = document.createElement("div");
