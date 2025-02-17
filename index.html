@@ -108,29 +108,30 @@ img {
     color: darkblue;
 }
 
-/* 🎚️ **Updated Progress Bar Styling** */
+/* 🎚️ Progress Bar Styling */
 #progressContainer {
-    width: 50%;  /* ✅ Half the page width */
-    max-width: 400px; /* ✅ Set a max width */
-    height: 20px; /* ✅ Reduce height */
+    width: 50%;
+    max-width: 400px;
+    height: 20px;
     background-color: #ddd;
-    border-radius: 10px; /* ✅ Rounded edges */
+    border-radius: 10px;
     overflow: hidden;
-    margin: 10px auto; /* ✅ Center it */
+    margin: 10px auto;
     box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
 }
 
 #progressBar {
     height: 100%;
-    background-color: #4caf50; /* ✅ Green color */
+    background-color: #4caf50;
     color: white;
     text-align: center;
     line-height: 20px;
     font-size: 14px;
     font-weight: bold;
-    border-radius: 10px; /* ✅ Match container */
-    transition: width 0.5s ease-in-out; /* ✅ Smooth animation */
+    border-radius: 10px;
+    transition: width 0.5s ease-in-out;
 }
+
 
 /* ✅ **Fixing progress text display** */
 #progressText {
@@ -267,6 +268,7 @@ img {
         <button onclick="clearSearch()" style="padding: 8px; margin-left: 5px; cursor: pointer;">❌ Clear</button>
     </div>
 
+
     <!-- 📌 Beam Structure -->
     <div class="wrapper">
         <div class="container">
@@ -303,17 +305,11 @@ img {
     </div>
 	
     <!-- 📊 Installation Progress -->
-    <h2 id="progress">Installation Progress: 0%</h2>
-    <div style="width: 100%; background-color: #ccc; border-radius: 10px;">
-        <div id="progressBar" style="width: 0%; height: 30px; background-color: green; text-align: center; color: white; border-radius: 10px;">
-            0%
-        </div>
-    </div>
+    <h2 id="installationProgressText">Installation Progress: 0%</h2>
 
     <div id="progressContainer">
-    <div id="progressBar">0%</div>
+        <div id="progressBar">0%</div>
     </div>
-    <p id="installationProgress">Installation Progress: 0%</p>
 
     <p id="statusMessage">Loading beam status...</p>
 
@@ -333,21 +329,18 @@ img {
 
     <!-- 📌 Beam Details Panel -->
     <div id="beamDetailsPanel" class="details-panel" style="display: none;">
-    <h3>Beam Details</h3>
-    <p><strong>Name:</strong> <span id="beamName"></span></p>
-    <p><strong>Status:</strong> <span id="beamStatus"></span></p>
-    <p><strong>Weight:</strong> <span id="beamWeight"></span></p>
-    <p><strong>Progress:</strong> <span id="beamProgress"></span></p>
-    <p><strong>Last Scanned:</strong> <span id="beamLastScanned"></span></p>
-    <p><strong>QR Code:</strong></p>
-    <a id="beamQRCodeLink" href="#" target="_blank">
-    <img id="beamQRCode" src="https://dummyimage.com/150x150/cccccc/000000&text=No+QR+Code" alt="QR Code" style="width: 150px; height: 150px;">
-    </a>
-    <button onclick="closePanel()">❌ Close</button>
-
-
-</div>
-
+        <h3>Beam Details</h3>
+        <p><strong>Name:</strong> <span id="beamName"></span></p>
+        <p><strong>Status:</strong> <span id="beamStatus"></span></p>
+        <p><strong>Weight:</strong> <span id="beamWeight"></span></p>
+        <p><strong>Progress:</strong> <span id="beamProgress"></span></p>
+        <p><strong>Last Scanned:</strong> <span id="beamLastScanned"></span></p>
+        <p><strong>QR Code:</strong></p>
+        <a id="beamQRCodeLink" href="#" target="_blank">
+            <img id="beamQRCode" src="https://dummyimage.com/150x150/cccccc/000000&text=No+QR+Code" alt="QR Code" style="width: 150px; height: 150px;">
+        </a>
+        <button onclick="closePanel()">❌ Close</button>
+    </div>
 
     <div id="beam-info">Click on a beam to see details</div>
 
@@ -479,30 +472,34 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     function updateTotalProgress() {
-        if (!window.beamData || !window.beamData.beams) {
-            console.error("❌ beamData is not available or missing 'beams' array!");
-            return;
-        }
-
-        let totalWeight = 0;
-        let installedWeight = 0;
-
-        window.beamData.beams.forEach(beam => {
-            totalWeight += beam.Weight || 0;
-            if (beam.Progress > 0) {
-                installedWeight += beam.Weight || 0;
-            }
-        });
-
-        let overallProgress = totalWeight > 0 ? (installedWeight / totalWeight) * 100 : 0;
-        
-        // ✅ Update Progress Bar (Only one bar remains)
-        progressBar.style.width = `${Math.min(overallProgress, 100)}%`;
-        progressBar.innerText = `${overallProgress.toFixed(2)}%`;
-        progressText.innerText = `Installation Progress: ${overallProgress.toFixed(2)}%`;
-
-        console.log(`✅ Total progress updated to: ${overallProgress.toFixed(2)}%`);
+    if (!window.beamData || !window.beamData.beams) {
+        console.error("❌ beamData is not available or missing 'beams' array!");
+        return;
     }
+
+    let totalWeight = 0;
+    let installedWeight = 0;
+
+    window.beamData.beams.forEach(beam => {
+        totalWeight += beam.Weight || 0; 
+        if (beam.Progress > 0) {
+            installedWeight += beam.Weight || 0;
+        }
+    });
+
+    let overallProgress = totalWeight > 0 ? (installedWeight / totalWeight) * 100 : 0;
+    
+    // ✅ Update Progress Bar
+    let progressBar = document.getElementById("progressBar");
+    let progressText = `${Math.round(overallProgress)}%`;
+
+    progressBar.style.width = `${Math.min(overallProgress, 100)}%`;
+    progressBar.innerText = progressText;
+    document.getElementById("installationProgressText").innerText = `Installation Progress: ${progressText}`;
+
+    console.log(`✅ Total progress updated to: ${progressText}`);
+}
+
 
     function updateBeamUI() {
         if (!window.beamData || !window.beamData.beams) {
