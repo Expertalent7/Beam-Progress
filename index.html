@@ -346,8 +346,7 @@
     <div id="beam-info">Click on a beam to see details</div>
 
     <script>
-	    
-   document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", function () {
     console.log("✅ Page Loaded, Assigning Global Fetch Function");
 
     // 🔄 Cache frequently accessed elements
@@ -452,7 +451,7 @@
                 let beamWeight = beamDataEntry.Weight && beamDataEntry.Weight !== 0 
                     ? `${beamDataEntry.Weight} kg` 
                     : "Unknown kg"; // ✅ Fix weight display
-                let beamProgress = beamDataEntry.Progress.toFixed(2);
+                let beamProgress = (beamDataEntry.Progress * 100).toFixed(2); // ✅ Convert to full percentage
                 let beamQRCode = beamDataEntry.QR_Code || "https://via.placeholder.com/150";
 
                 document.getElementById("beamName").innerText = beamName;
@@ -491,7 +490,7 @@
 
         let overallProgress = totalWeight > 0 ? (installedWeight / totalWeight) * 100 : 0;
         
-        // ✅ Update Progress Bar
+        // ✅ Update Progress Bar (Only one bar remains)
         progressBar.style.width = `${Math.min(overallProgress, 100)}%`;
         progressBar.innerText = `${overallProgress.toFixed(2)}%`;
         progressText.innerText = `Installation Progress: ${overallProgress.toFixed(2)}%`;
