@@ -346,24 +346,24 @@
     <div id="beam-info">Click on a beam to see details</div>
 
     <script>
-document.addEventListener("DOMContentLoaded", function () {
+	    
+   document.addEventListener("DOMContentLoaded", function () {
     console.log("✅ Page Loaded, Assigning Global Fetch Function");
 
     // 🔄 Cache frequently accessed elements
     const beamSearch = document.getElementById("beamSearch");
     const beamDetailsPanel = document.getElementById("beamDetailsPanel");
-    const statusMessage = document.getElementById("statusMessage");
-    const progressText = document.getElementById("progress");
+    const progressText = document.getElementById("installationProgress");
     const progressBar = document.getElementById("progressBar");
     const darkModeToggle = document.getElementById("darkModeToggle");
-    const body = document.body;
     const beams = document.querySelectorAll(".beam");
 
-    // ✅ Attach globally for console debugging
+    // ✅ Attach globally for debugging
     window.fetchBeamStatus = fetchBeamStatus;
     window.updateBeamUI = updateBeamUI;
+    window.updateTotalProgress = updateTotalProgress;
 
-    // ✅ Search Beams Efficiently
+    // ✅ Beam Search
     beamSearch.addEventListener("input", function () {
         let input = this.value.toLowerCase().trim();
         beams.forEach(beam => {
@@ -385,17 +385,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // 🌙 Dark Mode Toggle
     if (localStorage.getItem("darkMode") === "enabled") {
-        body.classList.add("dark-mode");
+        document.body.classList.add("dark-mode");
         darkModeToggle.innerText = "☀ Light Mode";
     }
 
     darkModeToggle.addEventListener("click", function () {
-        body.classList.toggle("dark-mode");
-        localStorage.setItem("darkMode", body.classList.contains("dark-mode") ? "enabled" : "disabled");
-        darkModeToggle.innerText = body.classList.contains("dark-mode") ? "☀ Light Mode" : "🌙 Dark Mode";
+        document.body.classList.toggle("dark-mode");
+        localStorage.setItem("darkMode", document.body.classList.contains("dark-mode") ? "enabled" : "disabled");
+        darkModeToggle.innerText = document.body.classList.contains("dark-mode") ? "☀ Light Mode" : "🌙 Dark Mode";
     });
 
-    // ✅ Fetch Beam Status
+    // 🔄 Fetch Beam Status
     async function fetchBeamStatus() {
         console.log("🔄 Fetching beam status...");
 
@@ -449,7 +449,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
             if (beamDataEntry) {
                 let beamStatus = beamDataEntry.Progress > 0 ? "Installed" : "Not Installed";
-                let beamWeight = beamDataEntry.Weight ? `${beamDataEntry.Weight} kg` : "Unknown kg"; // ✅ Fix weight display
+                let beamWeight = beamDataEntry.Weight && beamDataEntry.Weight !== 0 
+                    ? `${beamDataEntry.Weight} kg` 
+                    : "Unknown kg"; // ✅ Fix weight display
                 let beamProgress = beamDataEntry.Progress.toFixed(2);
                 let beamQRCode = beamDataEntry.QR_Code || "https://via.placeholder.com/150";
 
@@ -481,7 +483,7 @@ document.addEventListener("DOMContentLoaded", function () {
         let installedWeight = 0;
 
         window.beamData.beams.forEach(beam => {
-            totalWeight += beam.Weight || 0; // ✅ Avoid NaN issues
+            totalWeight += beam.Weight || 0;
             if (beam.Progress > 0) {
                 installedWeight += beam.Weight || 0;
             }
@@ -492,15 +494,37 @@ document.addEventListener("DOMContentLoaded", function () {
         // ✅ Update Progress Bar
         progressBar.style.width = `${Math.min(overallProgress, 100)}%`;
         progressBar.innerText = `${overallProgress.toFixed(2)}%`;
-        document.getElementById("installationProgress").innerText = `Installation Progress: ${overallProgress.toFixed(2)}%`;
+        progressText.innerText = `Installation Progress: ${overallProgress.toFixed(2)}%`;
 
         console.log(`✅ Total progress updated to: ${overallProgress.toFixed(2)}%`);
     }
 
-    // ✅ Call function after data is fetched
-    fetchBeamStatus().then(updateTotalProgress).catch(err => console.error("❌ Error fetching beam data:", err));
+    function updateBeamUI() {
+        if (!window.beamData || !window.beamData.beams) {
+            console.error("❌ beamData is not available or missing 'beams' array!");
+            return;
+        }
 
-    // ✅ Auto-fetch every 5 seconds
+        document.querySelectorAll(".beam").forEach(beamElement => {
+            let beamName = beamElement.dataset.name?.toLowerCase().trim();
+            let beamDataEntry = window.beamData.beams.find(b => 
+                b.Beam_Name.toLowerCase().trim() === beamName
+            );
+
+            if (beamDataEntry) {
+                beamElement.classList.toggle("selected", beamDataEntry.Progress > 0);
+                beamElement.dataset.progress = beamDataEntry.Progress.toFixed(2);
+                beamElement.dataset.qrCode = beamDataEntry.QR_Code;
+                beamElement.style.border = beamDataEntry.Progress > 0 ? "4px solid green" : "4px solid red";
+                console.log(`✅ Updated ${beamName} with Progress ${beamDataEntry.Progress}`);
+            } else {
+                beamElement.classList.remove("selected");
+                console.warn(`⚠ No matching data for ${beamName}`);
+            }
+        });
+    }
+
+    // ✅ Fetch beam data every 5 seconds
     setInterval(fetchBeamStatus, 5000);
 });
 
