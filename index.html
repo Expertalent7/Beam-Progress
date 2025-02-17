@@ -234,6 +234,11 @@
     	border-color: #007bff;
 	}
 
+	.installed {
+    	stroke: #00ff00 !important; /* Bright Green */
+    	stroke-width: 5px !important;
+}
+
 
     </style>
 </head>
@@ -367,8 +372,8 @@
         beamDetailsPanel.style.display = "none";
     };
 
-    // 🎯 Show Beam Details on Click
-    document.querySelectorAll(".beam").forEach(beamElement => {
+// 🎯 Show Beam Details on Click
+document.querySelectorAll(".beam").forEach(beamElement => {
     beamElement.addEventListener("click", function (event) {
         let beamName = this.dataset.name;
         let beamDataEntry = window.beamData.beams.find(b => 
@@ -380,23 +385,39 @@
             let beamWeight = beamDataEntry.Weight ? `${beamDataEntry.Weight} kg` : "Unknown kg"; // ✅ Fix weight display
             let beamProgress = beamDataEntry.Progress.toFixed(2);
             let beamQRCode = beamDataEntry.QR_Code || "https://via.placeholder.com/150";
-            
+
             document.getElementById("beamName").innerText = beamName;
             document.getElementById("beamStatus").innerText = beamStatus;
             document.getElementById("beamWeight").innerText = beamWeight; // ✅ Fixed weight
             document.getElementById("beamProgress").innerText = `${beamProgress}%`;
             document.getElementById("beamQRCode").src = beamQRCode;
-  		
-	    let isMobile = window.innerWidth <= 768;
+
+            let isMobile = window.innerWidth <= 768;
             beamDetailsPanel.style.left = isMobile ? "50%" : `${event.pageX + 10}px`;
             beamDetailsPanel.style.top = isMobile ? "50%" : `${event.pageY + 10}px`;
             beamDetailsPanel.style.transform = isMobile ? "translate(-50%, -50%)" : "";
-          
+
             beamDetailsPanel.style.display = "block";
         } else {
             console.warn(`⚠ No matching data found for ${beamName}`);
         }
     });
+});
+
+// ✅ Ensure Beam Status Updates Correctly with Colors
+document.querySelectorAll(".beam").forEach(beamElement => {
+    let beamName = beamElement.dataset.name?.toLowerCase().trim();
+    let beamDataEntry = window.beamData.beams.find(b => 
+        b.Beam_Name.toLowerCase().trim() === beamName
+    );
+
+    if (beamDataEntry) {
+        if (beamDataEntry.Progress > 0) {
+            beamElement.classList.add("installed"); // ✅ Add "installed" class for green
+        } else {
+            beamElement.classList.remove("installed");
+        }
+    }
 });
 
 
@@ -504,20 +525,28 @@
 }
 
 function updateTotalProgress() {
-    if (!window.beamData || !window.beamData.progress) {
-        console.warn("⚠ No progress data found!");
-        return;
-    }
-
-    let totalProgress = parseFloat(window.beamData.progress).toFixed(2);
+    if (!window.beamData || !window.beamData.beams) return;
     
-    // ✅ Update the text and progress bar
-    document.getElementById("progress").innerText = `Installation Progress: ${totalProgress}%`;
-    document.getElementById("progressBar").style.width = `${totalProgress}%`;
-    document.getElementById("progressBar").innerText = `${totalProgress}%`;
+    let totalWeight = 0;
+    let installedWeight = 0;
 
-    console.log(`📊 Updated Total Progress: ${totalProgress}%`);
+    window.beamData.beams.forEach(beam => {
+        totalWeight += beam.Weight || 0; // ✅ Ensure no NaN errors
+        if (beam.Progress > 0) {
+            installedWeight += beam.Weight || 0; // ✅ Count installed weight
+        }
+    });
+
+    let overallProgress = totalWeight > 0 ? (installedWeight / totalWeight) * 100 : 0;
+    
+    // ✅ Update Progress Bar
+    document.getElementById("progressBar").style.width = `${overallProgress.toFixed(2)}%`;
+    document.getElementById("progressBar").innerText = `${overallProgress.toFixed(2)}%`;
+    document.getElementById("installationProgress").innerText = `Installation Progress: ${overallProgress.toFixed(2)}%`;
 }
+
+// ✅ Call function after fetching data
+fetchBeamStatus().then(updateTotalProgress);
 
     // 🎯 Tooltip for Beam Info on Hover
     const tooltip = document.createElement("div");
